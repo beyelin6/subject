@@ -545,6 +545,307 @@ export default function App() {
     return cur;
   };
 
+  const ARCHETYPE_TO_STYLE: Record<string, string> = {
+    excel: 'inspiring',
+    diligent: 'steadfast',
+    improved: 'growth',
+    careless: 'potential',
+    passive: 'gentle',
+    struggling: 'collaboration',
+    slowButGood: 'steadfast',
+    activeDistracted: 'energetic',
+    cooperative: 'collaboration',
+    impatient: 'advice',
+  };
+
+  const getStudentArchetypeScores = (
+    pos: string[],
+    neu: string[],
+    neg: string[],
+    checkedList: CheckedDimension[]
+  ): Record<string, number> => {
+    const scores: Record<string, number> = {
+      excel: 0,
+      diligent: 0,
+      improved: 0,
+      careless: 0,
+      passive: 0,
+      struggling: 0,
+      slowButGood: 0,
+      activeDistracted: 0,
+      cooperative: 0,
+      impatient: 0,
+    };
+
+    const posCount = pos.length;
+    const neuCount = neu.length;
+    const negCount = neg.length;
+
+    // Detect specific standard checked dimensions
+    const hasAttitudeLow = checkedList.some(item => item.id === 'gen_attitude' && item.level === 'low');
+    const hasAttitudeHigh = checkedList.some(item => item.id === 'gen_attitude' && item.level === 'high');
+    const hasHomeworkLow = checkedList.some(item => item.id === 'gen_homework' && item.level === 'low');
+    const hasHomeworkHigh = checkedList.some(item => item.id === 'gen_homework' && item.level === 'high');
+    const hasDisciplineLow = checkedList.some(item => item.id === 'gen_discipline' && item.level === 'low');
+    const hasCooperationHigh = checkedList.some(item => item.id === 'gen_cooperation' && item.level === 'high');
+
+    // 1. excel
+    scores.excel = posCount * 3 - negCount * 2;
+    if (hasAttitudeHigh) scores.excel += 2;
+    if (hasHomeworkHigh) scores.excel += 2;
+
+    // 2. diligent
+    scores.diligent = neuCount * 2 + posCount * 1.5 - negCount * 2.5;
+    if (hasHomeworkHigh) scores.diligent += 2;
+
+    // 3. improved
+    scores.improved = posCount * 2 - negCount * 1;
+    if (checkedList.length >= 2) scores.improved += 1.5;
+
+    // 4. careless
+    if (posCount >= 1 && (hasHomeworkLow || hasAttitudeLow || hasDisciplineLow)) {
+      scores.careless = posCount * 3 + negCount * 1.5;
+    }
+
+    // 5. passive
+    scores.passive = neuCount * 3 - posCount * 1 - negCount * 1;
+    if (!hasAttitudeLow && !hasDisciplineLow && negCount === 0) {
+      scores.passive += 2;
+    }
+
+    // 6. struggling
+    scores.struggling = negCount * 4 - posCount * 3;
+    if (hasAttitudeLow) scores.struggling += 1.5;
+    if (hasHomeworkLow) scores.struggling += 1.5;
+
+    // 7. slowButGood
+    scores.slowButGood = neuCount * 2 + negCount * 2 - posCount * 3;
+
+    // 8. activeDistracted
+    if (hasAttitudeLow || hasDisciplineLow) {
+      scores.activeDistracted = posCount * 1.5 + negCount * 2;
+    }
+
+    // 9. cooperative
+    if (hasCooperationHigh) {
+      scores.cooperative = posCount * 2 + 4;
+    }
+
+    // 10. impatient
+    if (hasHomeworkLow && negCount >= 1) {
+      scores.impatient = negCount * 3 + 2;
+    }
+
+    return scores;
+  };
+
+  const analyzeStudentTypicalLabels = (
+    pos: string[],
+    neu: string[],
+    neg: string[],
+    checkedList: CheckedDimension[]
+  ): string[] => {
+    const scores = getStudentArchetypeScores(pos, neu, neg, checkedList);
+    
+    // Sort and grab all with score > 0
+    const sorted = Object.entries(scores)
+      .filter(([_, score]) => score > 0)
+      .sort((a, b) => b[1] - a[1])
+      .map(([key]) => key);
+
+    if (sorted.length === 0) {
+      if (pos.length >= neg.length) {
+        return ['excel'];
+      } else {
+        return ['struggling'];
+      }
+    }
+    return sorted;
+  };
+
+  const compileAdvancedRhetoricComment = (
+    key: string,
+    pos: string[],
+    neu: string[],
+    neg: string[],
+    sub: string
+  ): string => {
+    const allParts = [...pos, ...neu];
+    
+    // Archetype Keys templates
+    if (key === 'excel') {
+      return `其在${sub}領域的領會力極為傲人、超群絕倫，日常學習常能展露出${smartJoin(allParts)}的驚豔表現。若能精益求精，課堂與作業中多加留意並克服${smartJoin(neg) || '偶發之微小疏漏'}的情形，其學習造詣必能臻於無懈可擊之至境，前途無量！`;
+    }
+    if (key === 'diligent') {
+      return `學習態度敦實沉穩，宛如良木深扎其根。課堂能落實${smartJoin(allParts)}，日常練習與作業皆一絲不苟。雖目前於${smartJoin(neg) || '學科理解深度'}上稍呈緩步，相信憑其水滴石穿之恆心，終能破繭而出、成果非凡。`;
+    }
+    if (key === 'improved') {
+      return `本學期在${sub}展現出如春筍破土般驚人的學習與突破爆發力！課堂上不僅進一步做到${smartJoin(allParts)}，相較過往在${smartJoin(neg) || '學習主動性'}上的迷茫，近期展現了極佳的自省力與蛻變，此等進取心實屬難能可貴！`;
+    }
+    if (key === 'careless') {
+      return `思維靈動敏捷、智識感應極快。於${sub}之課堂常能${smartJoin(allParts)}，足見天資十分聰穎。惟作答與行事時，略有${smartJoin(neg) || '草率之意'}等急躁流弊，若能治心求靜、審慎複查，必能精準釋放驚人的學科潛能！`;
+    }
+    if (key === 'passive') {
+      return `學風溫潤守紀、治學態度如幽蘭在谷。平日靜好自律，能安靜落實${smartJoin(allParts)}。惟因課堂不喜張揚、表現較為被動，在${smartJoin(neg) || '積極發言'}上尚存進步空間，盼能多展露自信，主動突破！`;
+    }
+    if (key === 'struggling') {
+      return `目前在${sub}學習上正面臨階段之打底深水區，日常學習常有${smartJoin(neg) || '理解較緩'}等重重挫折。然孩子心中亦有探求之火，只要親師共同協作、給予溫暖耐心輔導，日常落實最基礎觀念練習，定能建立信心、化繁為簡！`;
+    }
+    if (key === 'slowButGood') {
+      return `古語云「大器晚成」，孩子正是慢工細活、精雕細琢的典範。在${sub}中雖有${smartJoin(neg) || '進度偏慢'}之實，但平時課堂仍能靠${smartJoin(allParts)}默默奠基。請給予孩子充分的消化時間，相信終能積沙成塔、大有可為！`;
+    }
+    if (key === 'activeDistracted') {
+      return `思維如火焰般充滿創造力與高昂能量。其在${sub}課堂中好動敏捷，常展現出${smartJoin(allParts)}。惟目前定性未足，日常容易分心而出現${smartJoin(neg) || '急躁分神'}，若課後能施以自我的專注鍛鍊，其領悟力定能有飛躍式成果。`;
+    }
+    if (key === 'cooperative') {
+      return `天生具備極佳的團隊凝聚力與利他胸懷！不但在組內勇於擔當${smartJoin(allParts)}之良心役，日常處事更懂相互協作。只要在個人單學科鑽研上改善${smartJoin(neg) || '自主專注時間'}，必能成為兼備才與德之優秀英才。`;
+    }
+    if (key === 'impatient') {
+      return `智識本不落人後，上課亦能積極參與${smartJoin(allParts)}。遺憾的是其耐挫力與恆心略有不足，每遇繁複雜題便容易出現${smartJoin(neg) || '輕易退縮'}之情況。課後宜加強耐力和挫折容忍度教育，持之以恆則必定能大開眼界。`;
+    }
+
+    // Style Keys templates
+    if (key === 'inspiring') {
+      return `其胸中藏有求知的星辰大海，課堂中能落實${smartJoin(allParts)}，才華橫溢。縱使前行路上面臨${smartJoin(neg) || '局部考驗'}之迷霧，莫憂莫懼，此皆是磨礪璞玉的必經過程，老師無比相信其能邁入無限閃耀的未來！`;
+    }
+    if (key === 'gentle') {
+      return `在老師的心目中，你一直是一個溫柔、懂事又討人喜愛的大孩子。在學習上，你能順利做到${smartJoin(allParts)}，真的很棒。這陣子若在${smartJoin(neg) || '課後練習'}上感到有些不容易，放鬆心情跟著老師的溫暖步調走，我們一定能一起克服的！`;
+    }
+    if (key === 'growth') {
+      return `「每一次微小的精進，都在為未來的自律灌溉。」這學期在${smartJoin(allParts)}上表現斐然。面對${smartJoin(neg) || '部分成果未臻理想'}的挑戰，這更像是我們下學期的黃金突破點，跨越它就是你嶄新的里程碑！`;
+    }
+    if (key === 'academic') {
+      return `本學期對${sub}學術範疇進行了全面評估。該生在${smartJoin(allParts)}指標上展現高度契合性。唯在${smartJoin(neg) || '日常習作書寫習慣'}等過程向度，仍存有待優化空間。建請家長協力，攜手建構精準的主動學習閉環。`;
+    }
+    if (key === 'potential') {
+      return `其思路非常開闊，具備極佳的學科感應與高度可塑性。日常能落實${smartJoin(allParts)}，成效卓越。可惜目前深受${smartJoin(neg) || '自控力缺失'}所侷限，若能施以合適之學習策略引導，其學科發展潛力定是無懈可擊！`;
+    }
+    if (key === 'collaboration') {
+      return `孩子的穩步成長，端賴親師之間無縫的引導與關懷。本學期他在學校能順利展現${smartJoin(allParts)}，表現可圈可點。唯於課後練習之${smartJoin(neg) || '習題訂正'}上，懇請家長與班級進一步達成協同課後輔導，陪伴孩子跨過此道學習檻。`;
+    }
+    if (key === 'advice') {
+      return `工欲善其事，必先利其器。其本身學習底子極佳，平日能熟練完成${smartJoin(allParts)}。然之所以仍受困於${smartJoin(neg) || '作答失誤'}，乃因尚未建立起科學的高效讀書策略。強烈建請日常建立錯題點整理，即可實現學習上的彎道超車！`;
+    }
+    if (key === 'steadfast') {
+      return `用最誠懇、穩健的步伐，走出一條最紮實的進步之路。平日裡不僅在${smartJoin(allParts)}上表現令人讚賞，即使在遭遇${smartJoin(neg) || '特定觀念卡關'}時，亦能保有踏實不驕、默默耕耘之極佳性情，可謂是大器晚成之良才。`;
+    }
+    if (key === 'energetic') {
+      return `孩子就是班上的朝氣泉源，渾身充滿著無盡的動色與能量！課堂之中能神采奕奕地做到${smartJoin(allParts)}。若能適度引導這股精沛，使之在${smartJoin(neg) || '安靜自律'}上更得兼顧，未來定是學科領域中極具號召力的活力領袖！`;
+    }
+    if (key === 'classic') {
+      return `本學期學科各項學習成效表現良好。課堂中能落實${smartJoin(allParts)}，課後成果符合預期。唯於${smartJoin(neg) || '細部向度'}尚有未臻完善之處，盼來期多加用功，以精益求精。`;
+    }
+
+    return '';
+  };
+
+  const adaptPhrasingForType = (phrases: string[], typeKey: string, level: 'pos' | 'neg'): string[] => {
+    return phrases.map(phrase => {
+      let res = phrase;
+
+      // 1. Archetypes Specific Adaptations
+      if (typeKey === 'excel') {
+        res = res
+          .replace(/表現良好/g, "表現極其卓越")
+          .replace(/大致符合/g, "完全契合並超越")
+          .replace(/成效符合期許/g, "成果極佳、令人喝采")
+          .replace(/穩健/g, "十分出色")
+          .replace(/待提攜/g, "稍加注意即進一步完美")
+          .replace(/待引導/g, "稍微調整更完美")
+          .replace(/有待加強/g, "僅微小處仍待微調");
+      } else if (typeKey === 'diligent') {
+        res = res
+          .replace(/表現良好/g, "表現踏實且平穩")
+          .replace(/大致能/g, "能按部就班且確實")
+          .replace(/成效符合期許/g, "成果扎實可靠")
+          .replace(/熟練/g, "規規矩矩且專注熟練");
+      } else if (typeKey === 'improved') {
+        res = "近期已能" + res
+          .replace(/表現良好/g, "並取得突破性的進步")
+          .replace(/大致能/g, "能明顯有所長進並逐漸熟練")
+          .replace(/成效符合期許/g, "相比往日大幅度躍升");
+      } else if (typeKey === 'careless') {
+        if (level === 'neg') {
+          res = "雖對此觀念理解極快，但" + res
+            .replace(/有待加強/g, "作答時常因求快而稍嫌急躁")
+            .replace(/困難/g, "常因粗心漏看題目而顯得有些粗枝大葉")
+            .replace(/被動/g, "偶顯毛躁而出現粗心疏漏");
+        } else {
+          res = "思維轉得飛快，" + res;
+        }
+      } else if (typeKey === 'passive') {
+        if (level === 'pos') {
+          res = "能在安靜沉穩中" + res;
+        } else if (level === 'neg') {
+          res = res
+            .replace(/被動/g, "溫和乖巧但偶顯被動退縮")
+            .replace(/不主動/g, "個性較為害羞安靜，不太敢主動表達意見和發問");
+        }
+      } else if (typeKey === 'struggling') {
+        res = res
+          .replace(/有待加強/g, "需要師長加倍關懷並手把手建立最基礎的信心")
+          .replace(/落後/g, "學術觀念尚在打底階段");
+      } else if (typeKey === 'slowButGood') {
+        res = res
+          .replace(/慢/g, "雖步伐稍緩但行事腳踏實地")
+          .replace(/未臻/g, "只要多給予一些耐心與時間，必能逐步學會");
+      } else if (typeKey === 'activeDistracted') {
+        if (level === 'neg') {
+          res = res
+            .replace(/容易分心/g, "日常活潑多動，較易因受身邊環境影響而分心")
+            .replace(/有待改進/g, "課堂多動且專注力較為短暫，定性有待多鍛鍊");
+        } else {
+          res = "在歡樂與高能互動中" + res;
+        }
+      } else if (typeKey === 'cooperative') {
+        if (level === 'pos') {
+          res = "在小組互動與責任分工中積極協助並" + res;
+        }
+      } else if (typeKey === 'impatient') {
+        if (level === 'neg') {
+          res = "一遇到繁雜的任務就" + res
+            .replace(/有待加強/g, "顯露退縮放棄的情緒，耐挫度待加強");
+        }
+      }
+
+      // 2. Styles Specific Adaptations
+      if (typeKey === 'inspiring') {
+        res = res
+          .replace(/表現良好/g, "展露出令人期待與感動的才華潛力")
+          .replace(/進步空間/g, "有著無可限量的登峰潛能");
+      } else if (typeKey === 'gentle') {
+        res = res
+          .replace(/待加強/g, "這部分偶爾比較吃力，老師會陪著你克服困難喔")
+          .replace(/落後/g, "別急，只要每天多一點點小練習，定能做得好")
+          .replace(/表現良好/g, "表現得好棒，讓老師覺得好欣慰");
+      } else if (typeKey === 'growth') {
+        res = res
+          .replace(/表現良好/g, "已順利達成本階段的成長指標")
+          .replace(/進步空間/g, "為下一學期預設之黃金目標");
+      } else if (typeKey === 'academic') {
+        res = res
+          .replace(/表現良好/g, "經客觀評估為優良")
+          .replace(/成果令人欣慰/g, "其考核指標完全符合課程期望與設置規格");
+      } else if (typeKey === 'potential') {
+        res = "其思路開闊，只要給予適當點撥即可" + res;
+      } else if (typeKey === 'collaboration') {
+        if (level === 'neg') {
+          res = res + "（此向度在課堂上表現稍有起伏，期待家長在課後協同溫習及輔導）";
+        }
+      } else if (typeKey === 'advice') {
+        if (level === 'neg') {
+          res = res + "（建議針對此向度落實建立錯題重點整理，並每天重複熟讀最精確的原始概念）";
+        }
+      } else if (typeKey === 'steadfast') {
+        res = "以無比的毅力與安定性，" + res;
+      } else if (typeKey === 'energetic') {
+        res = "總是神采奕奕、積極響應且" + res;
+      }
+
+      return res;
+    });
+  };
+
   const compiledGroups = useMemo(() => {
     const positives: string[] = [];
     const neutrals: string[] = [];
@@ -1202,14 +1503,42 @@ export default function App() {
 
     const result: Record<string, string> = {};
 
+    const checkedList = checkedDimensions[currentSubject] || [];
+    const typicalLabels = analyzeStudentTypicalLabels(
+      compiledGroups.positives,
+      compiledGroups.neutrals,
+      compiledGroups.negatives,
+      checkedList
+    );
+
     Object.keys(activeDataset).forEach(key => {
       const templateObj = activeDataset[key];
-      let assembled = templateObj.compile(
-        compiledGroups.positives,
-        compiledGroups.neutrals,
-        compiledGroups.negatives,
-        subjectLabel
-      );
+
+      const adaptedPositives = adaptPhrasingForType(compiledGroups.positives, key, 'pos');
+      const adaptedNeutrals = adaptPhrasingForType(compiledGroups.neutrals, key, 'pos');
+      const adaptedNegatives = adaptPhrasingForType(compiledGroups.negatives, key, 'neg');
+
+      const isMatched = generatorMode === 'archetypes' 
+        ? typicalLabels.includes(key)
+        : typicalLabels.some(archetypeKey => ARCHETYPE_TO_STYLE[archetypeKey] === key);
+
+      let assembled = "";
+      if (isMatched) {
+        assembled = compileAdvancedRhetoricComment(
+          key,
+          adaptedPositives,
+          adaptedNeutrals,
+          adaptedNegatives,
+          subjectLabel
+        );
+      } else {
+        assembled = templateObj.compile(
+          adaptedPositives,
+          adaptedNeutrals,
+          adaptedNegatives,
+          subjectLabel
+        );
+      }
 
       // Pronoun adaptations
       assembled = assembled.replace(/該生/g, nameToUse);
@@ -1232,7 +1561,18 @@ export default function App() {
     });
 
     return result;
-  }, [compiledGroups, studentName, pronoun, currentGrade, currentSubject, activeDataset, subjectLabel, isConciseMode]);
+  }, [compiledGroups, studentName, pronoun, currentGrade, currentSubject, activeDataset, subjectLabel, isConciseMode, checkedDimensions, generatorMode]);
+
+  const matchedLabels = useMemo(() => {
+    const rawChecked = checkedDimensions[currentSubject] || [];
+    if (rawChecked.length === 0) return [];
+    return analyzeStudentTypicalLabels(
+      compiledGroups.positives,
+      compiledGroups.neutrals,
+      compiledGroups.negatives,
+      rawChecked
+    );
+  }, [compiledGroups, checkedDimensions, currentSubject]);
 
   // Handle template selection when active student changes
   const handleSelectStudent = (student: Student) => {
@@ -1844,6 +2184,10 @@ export default function App() {
                     const activeVal = editedTexts[key] !== undefined ? editedTexts[key] : generatedBase;
                     const textLen = activeVal.length;
 
+                    const isMatchedCard = generatorMode === 'archetypes' 
+                      ? matchedLabels.includes(key)
+                      : matchedLabels.some(archetypeKey => ARCHETYPE_TO_STYLE[archetypeKey] === key);
+
                     // Compute text styling based on constraints
                     const isOptimalCount = textLen >= 70 && textLen <= 90;
                     const isExcessCount = textLen > 90;
@@ -1851,17 +2195,22 @@ export default function App() {
                     return (
                       <div 
                         key={key} 
-                        className={`p-4 rounded-2xl border ${styleConfig.theme} transition-all flex flex-col gap-2.5 shadow-2xs hover:shadow-sm`}
+                        className={`p-4 rounded-2xl border transition-all flex flex-col gap-2.5 shadow-2xs hover:shadow-md ${styleConfig.theme} ${isMatchedCard ? 'ring-2 ring-amber-400/80 border-amber-300 bg-gradient-to-br from-amber-50/15 to-transparent' : ''}`}
                       >
                         <div className="flex justify-between items-center">
                           <div className="flex flex-col">
                             <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">
                               風格模型 {index + 1}
                             </span>
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
                               <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${styleConfig.badge}`}>
                                 {styleConfig.name}
                               </span>
+                              {isMatchedCard && (
+                                <span className="text-[9px] font-black text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-3xs shrink-0">
+                                  ⭐ 智慧診斷最適推薦
+                                </span>
+                              )}
                               <span className="text-[10px] text-slate-500 font-medium">
                                 {styleConfig.desc}
                               </span>
