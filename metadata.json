@@ -1,6 +1,8 @@
 {
-  "name": "國小班級分科評語智慧型生成器",
+  "name": "國小班級分科評語智慧型生成器0620",
   "description": "提供國小教師針對1-6年級各主要學科進行正反向表現向度評估，一鍵智慧合成符合70-90字限制的成績單高質感評語，並包含班級學生名冊管理功能。",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
