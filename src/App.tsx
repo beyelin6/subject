@@ -138,10 +138,17 @@ export default function App() {
   const handleGradeChange = (grade: string) => {
     setCurrentGrade(grade);
     setEditedTexts({});
+    
+    // Check if the current subject exists in the new grade's subjects; if not, reset to 'chinese'
+    const newGradeSubjects = GRADE_SUBJECTS[grade] || GRADE_SUBJECTS['3'];
+    if (newGradeSubjects[currentSubject] === undefined) {
+      setCurrentSubject('chinese');
+    }
+
     if (activeStudent) {
       syncStudentToRoster({ grade });
     }
-    triggerToast(`年級學科區落已切換至：${grade}年級 (自動調整必修領域)`, 'info');
+    triggerToast(`年級學科區段已切換至：${grade}年級 (自動調整必修領域)`, 'info');
   };
 
   // Toggle active scoring dimension
@@ -1220,41 +1227,22 @@ export default function App() {
 
             {/* Grade Selection */}
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-2">年級區段（自動切換對應學科）</label>
-              <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
-                <button 
-                  type="button"
-                  onClick={() => handleGradeChange('2')}
-                  className={`py-2 rounded-lg font-bold text-center transition-all ${
-                    currentGrade === '1' || currentGrade === '2'
-                      ? 'bg-sky-600 text-white shadow-xs font-black' 
-                      : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                  }`}
-                >
-                  低年級 (1-2)
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => handleGradeChange('3')}
-                  className={`py-2 rounded-lg font-bold text-center transition-all ${
-                    currentGrade === '3' || currentGrade === '4'
-                      ? 'bg-sky-600 text-white shadow-xs font-black' 
-                      : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                  }`}
-                >
-                  中年級 (3-4)
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => handleGradeChange('5')}
-                  className={`py-2 rounded-lg font-bold text-center transition-all ${
-                    currentGrade === '5' || currentGrade === '6'
-                      ? 'bg-sky-600 text-white shadow-xs font-black' 
-                      : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                  }`}
-                >
-                  高年級 (5-6)
-                </button>
+              <label className="block text-xs font-bold text-slate-600 mb-2">年級選擇（依年級切換專屬學科指標）</label>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
+                {['1', '2', '3', '4', '5', '6'].map((gNum) => (
+                  <button 
+                    key={gNum}
+                    type="button"
+                    onClick={() => handleGradeChange(gNum)}
+                    className={`py-2 rounded-lg font-bold text-center transition-all ${
+                      currentGrade === gNum
+                        ? 'bg-sky-600 text-white shadow-xs font-black' 
+                        : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                    }`}
+                  >
+                    {gNum} 年級
+                  </button>
+                ))}
               </div>
             </div>
 

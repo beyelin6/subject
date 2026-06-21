@@ -1,35 +1,23 @@
 import { SubjectKey, SubjectInfo, Dimension } from './types';
 
-export const GRADE_SUBJECTS: Record<string, Record<SubjectKey, SubjectInfo>> = {
+export const GRADE_SUBJECTS: Record<string, Partial<Record<SubjectKey, SubjectInfo>>> = {
   "1": {
     chinese: { name: '📚 國語文', icon: 'BookOpen' },
     math: { name: '🧮 數學', icon: 'Calculator' },
-    life: { name: '🌱 生活課程', icon: 'Sparkles' },
+    life: { name: '🌱 生活領域', icon: 'Sparkles' },
     health: { name: '🍎 健康', icon: 'HeartPulse' },
     pe: { name: '🏃 體育', icon: 'Dribbble' },
     local: { name: '🗣️ 本土語文', icon: 'MessageSquare' },
-    general: { name: '🧩 綜合活動', icon: 'Puzzle' },
-    social: { name: '🌍 社會', icon: 'Globe' },
-    english: { name: '🔤 英語文', icon: 'Languages' },
-    science: { name: '🔬 自然科學', icon: 'FlaskConical' },
-    fineart: { name: '🎨 美勞', icon: 'Palette' },
-    music: { name: '🎵 音樂', icon: 'Music' },
-    tech: { name: '💻 資訊與科技', icon: 'Laptop' }
+    english: { name: '🔤 英語文', icon: 'Languages' }
   },
   "2": {
     chinese: { name: '📚 國語文', icon: 'BookOpen' },
     math: { name: '🧮 數學', icon: 'Calculator' },
-    life: { name: '🌱 生活課程', icon: 'Sparkles' },
+    life: { name: '🌱 生活領域', icon: 'Sparkles' },
     health: { name: '🍎 健康', icon: 'HeartPulse' },
     pe: { name: '🏃 體育', icon: 'Dribbble' },
     local: { name: '🗣️ 本土語文', icon: 'MessageSquare' },
-    general: { name: '🧩 綜合活動', icon: 'Puzzle' },
-    social: { name: '🌍 社會', icon: 'Globe' },
-    english: { name: '🔤 英語文', icon: 'Languages' },
-    science: { name: '🔬 自然科學', icon: 'FlaskConical' },
-    fineart: { name: '🎨 美勞', icon: 'Palette' },
-    music: { name: '🎵 音樂', icon: 'Music' },
-    tech: { name: '💻 資訊與科技', icon: 'Laptop' }
+    english: { name: '🔤 英語文', icon: 'Languages' }
   },
   "3": {
     chinese: { name: '📚 國語文', icon: 'BookOpen' },
@@ -408,25 +396,25 @@ export const SUBJECT_DIMENSIONS: Record<string, Record<string, Dimension[]>> = {
     "2": [
       { id: "music_performance", name: "🎤 木琴三角鐵敲擊與兒歌自彈自唱（演奏與歌唱）", labels: { high: "🟢 視譜敲擊流暢無比，自彈自拍音準極佳", mid: "🟡 能按節奏敲擊基本旋律，並配合大部齊唱", low: "🔴 左右手協調弱、敲擊易錯，唱歌與演奏不配合" } },
       { id: "music_appreciation", name: "👂 節奏符號聽辨與合奏和諧度欣賞（聽覺鑑賞）", labels: { high: "🟢 熟悉音符節奏，體會多種樂器交織的和諧美", mid: "🟡 辨識四分與八分音符，說出合奏大略優缺", low: "🔴 對基本節奏符號感到生疏，聽不出合奏的融合度" } },
-      { id: "music_attitude", name: "🎵 樂器與歌曲分工協調與團隊合作（學習態度）", labels: { high: "🟢 熱忱投入班級合奏，在聲部合作中表現亮眼", mid: "🟡 聽從聲部安排，善盡守序任務，不與同儕搶拍", low: "🔴 合奏時各敲各的，常爭強好勝，節奏雜亂無章" } }
+      { id: "music_attitude", name: "🎵 樂器與歌曲分工協調與團隊合作（學習態度）", labels: { high: "🟢 熱忱投入班級合奏，在聲部合作中表现亮眼", mid: "🟡 聽從聲部安排，善盡守序任務，不與同儕搶拍", low: "🔴 合奏時各敲各的，常爭強好勝，節奏雜亂無章" } }
     ],
     "3": [
-      { id: "music_performance", name: "🎤 直笛基礎指法音階與吹奏運氣技巧（樂器吹奏）", labels: { high: "🟢 直笛按孔確實不漏風，吹氣平穩音色亮麗", mid: "🟡 能吹出課本基礎音階，指法在引導下熟練", low: "🔴 直笛按孔不密，吹氣過猛容易發出尖銳破音" } },
+      { id: "music_performance", name: "🎤 直笛基礎指法音階、歌唱與節奏搭配（笛奏與歌唱）", labels: { high: "🟢 直笛按孔確實不漏風，歌唱音準與拍子節奏極佳", mid: "🟡 能吹出直笛基礎旋律，並配合小組進行歌唱", low: "🔴 直笛按孔未密，唱歌拍子與合奏旋律易脫節" } },
       { id: "music_appreciation", name: "👂 讀譜試拍與鄉土童謠文化音樂欣賞（讀譜鑑賞）", labels: { high: "🟢 讀譜速度快且音準好，深刻體會童謠韻味", mid: "🟡 看懂簡易五線譜音高，能跟唱朗朗上口童謠", low: "🔴 五線譜認音慢，對鄉土民歌的神韻理解較淺" } },
       { id: "music_attitude", name: "🎵 直笛吹奏常規秩序與衛生保養習慣（學習態度）", labels: { high: "🟢 遵守不私吹直笛紀律，課後主動清潔甩笛水", mid: "🟡 定期消毒保養個人直笛，課堂吹奏自律性好", low: "🔴 老師講話時仍隨意吹笛吵鬧，笛套內常不清理" } }
     ],
     "4": [
-      { id: "music_performance", name: "🎤 輪唱與二部合唱、高音直笛指法吹奏（歌奏能力）", labels: { high: "🟢 聲部和諧不易被拉走，直笛中高音區吹奏流暢", mid: "🟡 參與二部歌曲輪唱，直笛期末曲考驗能過關", low: "🔴 合唱容易跟別部跑調，直笛吹奏時手指常僵硬" } },
+      { id: "music_performance", name: "🎤 輪唱與二部合唱、高音直笛與敲擊樂節奏（合唱與節奏）", labels: { high: "🟢 聲部合唱和諧不易跑調，直笛與敲擊樂節奏精確", mid: "🟡 參與二部歌唱輪唱，能按拍子完成直笛吹奏運氣", low: "🔴 唱歌容易跑調，直笛或敲擊樂節奏常僵硬不協調" } },
       { id: "music_appreciation", name: "👂 東西樂器介紹與節奏強弱重拍賞析（音樂鑑賞）", labels: { high: "🟢 辨識弦樂與擊樂音色極準，精準掌握三四拍強弱", mid: "🟡 區分小提琴與古箏之美，指出強拍與弱拍區別", low: "🔴 對東西方樂器形制音色混淆，對拍子強弱聽辨弱" } },
       { id: "music_attitude", name: "🎵 班級齊奏凝聚力與特定笛曲發表（學習態度）", labels: { high: "🟢 主動帶領同儕排練，在音樂發表中台風大方穩健", mid: "🟡 準時帶直笛，配合大合奏排練並完成分組發表", low: "🔴 音樂發表時害羞不敢吹，與同儕合作齊奏不協調" } }
     ],
     "5": [
-      { id: "music_performance", name: "🎤 直笛多聲部曲吹奏、高音笛進階技法（多聲合奏）", labels: { high: "🟢 指法滑音流利，多聲部直笛合奏旋律優美", mid: "🟡 能配合吹好主旋律，並跟上副部伴奏之節奏", low: "🔴 視譜跟不上合奏速度，多聲部直笛吹奏常卡住" } },
+      { id: "music_performance", name: "🎤 直笛多聲部曲吹奏、合唱配合與複綜節奏（歌唱與合奏）", labels: { high: "🟢 笛聲合唱旋律優美，多聲部合音精緻且節奏感強", mid: "🟡 能吹奏主旋律，並跟上副部合唱與伴奏之節奏", low: "🔴 唱歌與吹奏跟不上速度，多聲部節奏合音常卡住" } },
       { id: "music_appreciation", name: "👂 世界歌曲與歌劇大師故事多元賞析（世界音樂）", labels: { high: "🟢 對歌劇背景與音色特質見解卓越，音樂心得很棒", mid: "🟡 了解著名歌劇大師故事，寫下基本的聽後感想", low: "🔴 世界民歌風情不甚理解，對歌劇大師故事感到茫然" } },
       { id: "music_attitude", name: "🎵 合奏聲部配合度與自理專注常規守秩序（舞台素養）", labels: { high: "🟢 熱忱與其他聲部協調，完全服從指揮且極端專注", mid: "🟡 保持端正合奏體態，認真練習個人笛譜不隨意說話", low: "🔴 合奏時音準與拍子隨意，排練定性不足易講小話" } }
     ],
     "6": [
-      { id: "music_performance", name: "🎤 畢業季歌齊奏齊唱、交響樂主題與樂理（合唱合奏）", labels: { high: "🟢 畢業合唱感情真摯，音色高雅，樂理概念極清晰", mid: "🟡 熟記畢業歌歌詞與節奏，參與大合唱表現端正良好", low: "🔴 畢業歌拍子跟不上，大合唱時僅對嘴，不願出聲" } },
+      { id: "music_performance", name: "🎤 畢業季歌齊唱齊奏、交響樂主題與樂理節奏（合唱與節奏）", labels: { high: "🟢 畢業合唱與齊奏富有感情，樂理與拍子節奏概念極佳", mid: "🟡 熟記畢業歌歌詞，參與合唱並能掌握基本打擊節奏", low: "🔴 畢業歌歌唱與拍子常跟不上，合奏敲擊時較被動" } },
       { id: "music_appreciation", name: "👂 古典與當代臺灣音樂家故事專題賞析（音樂大師）", labels: { high: "🟢 音樂大師風格脈絡如數家珍，極具人文藝術關懷", mid: "🟡 能說出著名交響樂主題，聽辨台灣歌謠背景歷史", low: "🔴 對著名交響樂章認識表面，對當代台灣民謠無感" } },
       { id: "music_attitude", name: "🎵 畢業典禮音樂排練與音樂會常規自律（舞台素養）", labels: { high: "🟢 帶頭認真排練展現舞台魅力，聆聽常規自律無比", mid: "🟡 遵守排練時間與場地紀律，配合做好典禮合唱訓練", low: "🔴 音樂排練敷衍逃避，台下聆聽他人演出時吵鬧好動" } }
     ]
