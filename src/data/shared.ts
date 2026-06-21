@@ -25,13 +25,12 @@ export const GRADE_SUBJECTS: Record<string, Partial<Record<SubjectKey, SubjectIn
     english: { name: '🔤 英語文', icon: 'Languages' },
     science: { name: '🔬 自然科學', icon: 'FlaskConical' },
     social: { name: '🌍 社會', icon: 'Globe' },
-    fineart: { name: '🎨 美勞', icon: 'Palette' },
+    fineart: { name: '🎨 藝術與美感', icon: 'Palette' },
     music: { name: '🎵 音樂', icon: 'Music' },
     health: { name: '🍎 健康', icon: 'HeartPulse' },
     pe: { name: '🏃 體育', icon: 'Dribbble' },
     general: { name: '🧩 綜合活動', icon: 'Puzzle' },
     tech: { name: '💻 資訊與科技', icon: 'Laptop' },
-    life: { name: '🌱 藝美課程', icon: 'Sparkles' },
     local: { name: '🗣️ 本土語文', icon: 'MessageSquare' }
   },
   "4": {
@@ -40,13 +39,12 @@ export const GRADE_SUBJECTS: Record<string, Partial<Record<SubjectKey, SubjectIn
     english: { name: '🔤 英語文', icon: 'Languages' },
     science: { name: '🔬 自然科學', icon: 'FlaskConical' },
     social: { name: '🌍 社會', icon: 'Globe' },
-    fineart: { name: '🎨 美勞', icon: 'Palette' },
+    fineart: { name: '🎨 藝術與美感', icon: 'Palette' },
     music: { name: '🎵 音樂', icon: 'Music' },
     health: { name: '🍎 健康', icon: 'HeartPulse' },
     pe: { name: '🏃 體育', icon: 'Dribbble' },
     general: { name: '🧩 綜合活動', icon: 'Puzzle' },
     tech: { name: '💻 資訊與科技', icon: 'Laptop' },
-    life: { name: '🌱 藝美課程', icon: 'Sparkles' },
     local: { name: '🗣️ 本土語文', icon: 'MessageSquare' }
   },
   "5": {
@@ -55,13 +53,12 @@ export const GRADE_SUBJECTS: Record<string, Partial<Record<SubjectKey, SubjectIn
     english: { name: '🔤 英語文', icon: 'Languages' },
     science: { name: '🔬 自然科學', icon: 'FlaskConical' },
     social: { name: '🌍 社會', icon: 'Globe' },
-    fineart: { name: '🎨 美勞', icon: 'Palette' },
+    fineart: { name: '🎨 藝術與美感', icon: 'Palette' },
     music: { name: '🎵 音樂', icon: 'Music' },
     health: { name: '🍎 健康', icon: 'HeartPulse' },
     pe: { name: '🏃 體育', icon: 'Dribbble' },
     general: { name: '🧩 綜合活動', icon: 'Puzzle' },
     tech: { name: '💻 資訊與科技', icon: 'Laptop' },
-    life: { name: '🌱 藝美課程', icon: 'Sparkles' },
     local: { name: '🗣️ 本土語文', icon: 'MessageSquare' }
   },
   "6": {
@@ -70,13 +67,12 @@ export const GRADE_SUBJECTS: Record<string, Partial<Record<SubjectKey, SubjectIn
     english: { name: '🔤 英語文', icon: 'Languages' },
     science: { name: '🔬 自然科學', icon: 'FlaskConical' },
     social: { name: '🌍 社會', icon: 'Globe' },
-    fineart: { name: '🎨 美勞', icon: 'Palette' },
+    fineart: { name: '🎨 藝術與美感', icon: 'Palette' },
     music: { name: '🎵 音樂', icon: 'Music' },
     health: { name: '🍎 健康', icon: 'HeartPulse' },
     pe: { name: '🏃 體育', icon: 'Dribbble' },
     general: { name: '🧩 綜合活動', icon: 'Puzzle' },
     tech: { name: '💻 資訊與科技', icon: 'Laptop' },
-    life: { name: '🌱 藝美課程', icon: 'Sparkles' },
     local: { name: '🗣️ 本土語文', icon: 'MessageSquare' }
   }
 };
