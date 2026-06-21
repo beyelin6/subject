@@ -332,6 +332,69 @@ export default function App() {
     return customList.find(d => d.id === id) || null;
   };
 
+  const hashStringToNumber = (str: string): number => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash);
+  };
+
+  const spinText = (text: string, seed: number): string => {
+    let result = text;
+
+    // 1. Resolve brace syntax if any, e.g., {{A|B|C}}
+    const braceRegex = /\{\{([^}]+)\}\}/g;
+    let match;
+    while ((match = braceRegex.exec(result)) !== null) {
+      const options = match[1].split('|');
+      const chosen = options[seed % options.length];
+      result = result.replace(match[0], chosen);
+    }
+
+    // 2. Perform safe, contextual synonym replacement
+    const synonymPools = [
+      { pattern: /極佳/g, replacements: ["優秀且卓越", "表現甚為突出", "至為亮眼", "深得肯定"] },
+      { pattern: /表現良好/g, replacements: ["表現可圈可點", "成效優異進取", "展現出色本質", "表現平穩出眾"] },
+      { pattern: /表現優異/g, replacements: ["成果斐然肯定", "表現深獲期待", "表現極富水準", "堪為同學表率"] },
+      { pattern: /學習態度主動/g, replacements: ["學習積極充滿熱忱", "能展現高度主動性", "求知態度十分真切"] },
+      { pattern: /專注聽講/g, replacements: ["聽講神情專注", "能維持高度專精", "上課目光專心致志"] },
+      { pattern: /確實執行/g, replacements: ["貫徹執行", "認真體現", "踏實完成"] },
+      { pattern: /確實/g, replacements: ["穩健", "扎實", "落實"] },
+      { pattern: /動作(敏捷|快速)/g, replacements: ["手法俐落", "動作極具效率", "反應敏捷快速"] },
+      { pattern: /成效理想/g, replacements: ["成果卓著", "效益顯著", "成果符合期望"] },
+      { pattern: /主動/g, replacements: ["自動自發", "自主不怠", "積極熱切"] },
+      { pattern: /愛讀書|愛聽故事/g, replacements: ["極具閱讀雅興", "對閱讀抱有高度興趣"] },
+      { pattern: /思維/g, replacements: ["思路", "理解切入點"] },
+      { pattern: /非常|十分|極度|格外/g, replacements: ["相當", "甚為", "與眾不同地", "頗具"] },
+      
+      { pattern: /大致上能/g, replacements: ["基本上可", "大體符合要求並已能", "日常多能穩定完成"] },
+      { pattern: /秩序穩定/g, replacements: ["課堂常規安靜規矩", "遵守紀律", "上課常態良好"] },
+      { pattern: /表現符合常態/g, replacements: ["表現合乎基礎規範", "跟上日常學習節奏"] },
+      { pattern: /配合/g, replacements: ["體現", "參與配合", "契合"] },
+      { pattern: /大體/g, replacements: ["大致上", "基本"] },
+      
+      { pattern: /待加強/g, replacements: ["仍待多加精進", "有待持續琢磨", "尚有不小提升空間"] },
+      { pattern: /有進步空間/g, replacements: ["仍需時間與耐心來補強", "尚有可期待之卓越潛能", "尚需加倍勤勉精進"] },
+      { pattern: /容易分心/g, replacements: ["偶爾思緒游走", "專注耐力偏弱", "上課時常走神"] },
+      { pattern: /毛躁/g, replacements: ["定性稍嫌不足", "急躁不夠沉穩"] },
+      { pattern: /馬虎/g, replacements: ["欠缺細緻審慎", "偶爾會有些微紕漏"] },
+      { pattern: /較為被動/g, replacements: ["主動意識略顯薄弱", "常需師長在旁積極勉勵"] }
+    ];
+
+    synonymPools.forEach((pool, index) => {
+      const matches = result.match(pool.pattern);
+      if (matches) {
+        matches.forEach((_, matchIdx) => {
+          const chosen = pool.replacements[(seed + index + matchIdx) % pool.replacements.length];
+          result = result.replace(pool.pattern, chosen);
+        });
+      }
+    });
+
+    return result;
+  };
+
   const getFragmentText = (id: string, level: 'high' | 'mid' | 'low'): string => {
     const dim = getDimensionObj(id);
     if (!dim) return "";
@@ -345,21 +408,46 @@ export default function App() {
       return `${dim.name.replace(/^🎨\s*/, '')}表現良好`;
     }
 
+    let text = "";
+
     // If general attribute
     if (id.startsWith('gen_')) {
       const behaviors = FRAGMENTS.general_behaviors;
       if (behaviors && behaviors[id]) {
-        return behaviors[id][level] || "";
+        const val = behaviors[id][level];
+        if (Array.isArray(val)) {
+          const studentSeed = activeStudent ? hashStringToNumber(activeStudent.id + id) : 0;
+          const globalSeed = Object.values(variationSeeds).reduce((acc: number, v: any) => acc + (Number(v) || 0), 0) as number;
+          text = val[(studentSeed + globalSeed) % val.length];
+        } else {
+          text = val || "";
+        }
+      }
+    } else {
+      // Subject pre-defined
+      const subjectData = FRAGMENTS[currentSubject] || {};
+      if (subjectData[id]) {
+        const val = subjectData[id][level];
+        if (Array.isArray(val)) {
+          const studentSeed = activeStudent ? hashStringToNumber(activeStudent.id + id) : 0;
+          const globalSeed = Object.values(variationSeeds).reduce((acc: number, v: any) => acc + (Number(v) || 0), 0) as number;
+          text = val[(studentSeed + globalSeed) % val.length];
+        } else {
+          text = val || "";
+        }
       }
     }
 
-    // Subject pre-defined
-    const subjectData = FRAGMENTS[currentSubject] || {};
-    if (subjectData[id]) {
-      return subjectData[id][level] || "";
+    if (!text) {
+      text = `${dim.name}符合標準`;
     }
 
-    return `${dim.name}符合標準`;
+    // Now spin the text to introduce dynamic variety!
+    const studentSeed = activeStudent ? hashStringToNumber(activeStudent.id + id + level) : 0;
+    const globalSeed = Object.values(variationSeeds).reduce((acc: number, v: any) => acc + (Number(v) || 0), 0) as number;
+    const finalSeed = studentSeed + globalSeed;
+
+    return spinText(text, finalSeed);
   };
 
   const smartJoin = (arr: string[]): string => {
@@ -421,223 +509,68 @@ export default function App() {
       .replace(/熟練繪製與判讀二維折線圖、複雜長條圖與表格/g, "折線長條圖及表格判讀熟練")
       .replace(/熟練求出長方形與正方形的面積公式與對稱圖形/g, "熟練方型面積與對稱圖形")
       .replace(/能熟練求出各種立體圖形的表面積與體積公式/g, "掌握立體圖形表面積與體積")
-      .replace(/能熟練求出扇形面積、複合圖形面積與圓心角/g, "能靈活算扇形與複合圖形")
-      .replace(/在應用題中邏輯清晰，能精準列出方程式解答/g, "應用題邏輯清，算式列式快")
-      .replace(/能敏銳找出數列與幾何圖案的規律性與邏輯/g, "善於發現數列與圖樣規律")
-      .replace(/數據平均數、中位數與眾數等圖表分析能力卓越/g, "眾數平均數與圖表解析能力強")
-      .replace(/機率概念極佳，能清晰思索多步驟的邏輯排列組合/g, "機率概念佳且能解排列組合")
-      .replace(/對速率的概念非常清晰，能靈活解決追趕與相向運動/g, "速率概念清，善解行程應用題")
-      
-      // Social Long Phrases
-      .replace(/熟知學校史地背景，熱心參與環境規劃/g, "熟知校史與熱心規劃環境")
-      .replace(/能與同伴共同規劃安全上學路線，安全意識好/g, "能安全參與規劃上學路線")
-      .replace(/家庭角色與溝通意識極佳，能體貼長輩辛苦/g, "家庭溝通佳，深體長輩辛苦")
-      .replace(/能清楚認識並認同家族世代傳承的價值與歷史/g, "深切認同家族與世代傳承價值")
-      .replace(/對地方文史特色暸解深入，並能主動關心社區發展/g, "熟知地方文史，關心社區發展")
-      .replace(/對台灣地理位置、氣候與地形特色具備優異的分析力/g, "對台灣地理與地形分析力佳")
-      .replace(/能主動探究家鄉的由來，對家鄉產業轉型提出觀點/g, "能積極研究並探討家鄉百業")
-      .replace(/對台灣多元族群與文化發展史有深入且包容的思維/g, "對台灣族群文化有包容思維")
-      .replace(/充分理解個人與消費的關係，並能建立綠色消費的習慣/g, "具備良好預算與綠色消費觀")
-      .replace(/對社會變遷與環境生態交互關係能主動提出深入見解/g, "探究社會變遷，關心環境生態")
-      .replace(/清楚理解民主素養與法治社會的價值，課堂展現思辨力/g, "理解民主法治價值且極具思辨")
-      .replace(/深刻體認公民責任與社會關懷，能提出具體服務行動/g, "具公民責任，能主動關懷社會")
-      .replace(/具備宏觀的國際視野，能理性探究全球性議題與危機/g, "富國際視野，關心全球議題")
-      .replace(/能深入探討各項社會議題與政策，積極展現公民參與/g, "關心社會議題，積極展現公民力")
-      .replace(/清楚人際溝通的本質，能理性分析並主動排解人際衝突/g, "人際溝通佳，善於調解衝突")
-      .replace(/能建立健全的理財決策，明白投資與風險管理的觀念/g, "具備理財決策與風險治理意識")
-      
-      // Science Long Phrases
-      .replace(/觀察力極佳，能詳盡記錄並分析各項實驗數據/g, "實驗觀察佳，記錄數據詳實")
-      .replace(/能熟練掌握顯微鏡等科學儀器的操作，操作手法細緻/g, "操作儀器熟練且精準細緻")
-      .replace(/對科學實驗具有高度熱忱，能自主設計實驗流程/g, "實驗熱忱高，能自主設計流程")
-      .replace(/探究精神優異，面對未知的自然現象能主動尋找答案/g, "探究精神佳，能自主主動解惑")
-      
-      // English Long Phrases
-      .replace(/英文字彙量極大，且能靈活運用於書寫與對話中/g, "英文字彙豐富，善對話及書寫")
-      .replace(/發音精準且音調自然，口語發表能力卓越，落落大方/g, "發音自然，上台口說落落大方")
-      .replace(/聽力理解能力卓越，能迅速掌握長篇對話的核心重點/g, "英語聽力佳，能掌握對話核心")
-      .replace(/閱讀流暢且語感極佳，能讀懂長篇文章並做出摘要/g, "英語閱讀順暢且語感掌握佳")
-      .replace(/能書寫文法正確、段落通順且結構完整的英文短文/g, "英語造句流暢，文法架構完整")
-      
-      // General Subject Long Phrases
-      .replace(/能清楚表達自己的興趣與長處，面對新事物願意勇敢嘗試，並能察覺與適當表達自身的情緒/g, "能表述興趣長處並勇於嘗試新事物、適當調控情緒")
-      .replace(/大致能認識自己的興趣，面對挑戰能嘗試應對，在情緒表達上平靜合理/g, "能認識興趣，平穩面對挑戰與情緒")
-      .replace(/較難具體說出自己的優點，面對困難挑戰時容易退縮，需多給予正向鼓勵建立自信/g, "較難具體陳述優勢，遇挑戰需鼓勵建構信心")
-      .replace(/樂於參與小組活動，能耐心聆聽同學的想法，並在團體討論中展現友善、合群的合作態度/g, "樂於傾聽同學想法，在團體討論中展現合群")
-      .replace(/在小組活動中較堅持己見，或是過於被動不願參與討論，與同儕溝通、協調的能力需多加引導/g, "活動中較堅持己見，需多加引導同儕溝通")
-      .replace(/能確實執行自己的生活作息表，主動完成個人份內工作與家務，展現良好的時間管理與自理能力/g, "確實執行作息，自理工作主動且時間管理佳")
-      .replace(/時間觀念較薄弱，容易拖延作業或忘記攜帶學用品，生活自理與物品收拾的習慣需再加強/g, "時間觀念與自理習慣偏薄弱，應加強收拾")
-      
-      .replace(/積極探索自身在智力、藝術或運動等多元潛能，面對問題時能提出創意的想法，展現靈活的思考力/g, "積極探索多元潛能，能創意思考並提出新點子")
-      .replace(/思考模式較為固定，較難主動提出新的點子或解決方案，對新奇事物的探索動機可再提升/g, "思考稍受限，宜引導發想創意及探索動機")
-      .replace(/在團隊任務中能承擔不同的角色責任，面對同學間的意見分歧，能運用理性的態度溝通並協調解決/g, "能承擔團隊責任且理性協調意見分歧")
-      .replace(/面對同儕意見衝突時容易情緒化或選擇逃避，在團隊中承擔責任的積極度尚有進步空間/g, "遇到衝突易情緒化逃避，承擔責任積極度待磨練")
-      .replace(/具備良好的綠色環保意識，能具體落實節能減碳與資源回收；在消費時能區分「想要」與「需要」，建立初階理財觀/g, "落實減碳資源回收，合理消費理財")
-      .replace(/對生活周遭的環境整潔與環保行動較不關心；消費與理財觀念較薄弱，需多引導其記帳習慣/g, "環保與理財觀待加強，需引導建立記帳習慣")
-      
-      .replace(/透過生命故事探討，能深刻體會生命的價值，且面對學習或人際上的挫折時，展現優異的情緒復原力與韌性/g, "體會生命價值，挫折調適佳且極具情緒韌性")
-      .replace(/面對失敗或表現不如預期時，容易陷入負面情緒難以抽離，挫折容忍力與心理調適的彈性需多加陪伴/g, "遇失敗易陷負面情緒，挫折容忍力待多陪伴")
-      .replace(/在小組策劃活動（如義賣、宣導或班會）中，能有條理地規劃步驟、分配任務，並確實將計畫執行完成，具備優秀的企劃能力/g, "小組活動中步驟清晰，執行與企劃能力優異")
-      .replace(/參與專題企劃時，想法較不具體或難以將計畫落實為行動，執行計畫時的持續力需要師長督促/g, "專題企劃想法較模糊，計畫落實與持續力需叮嚀")
-      .replace(/能主動關懷弱勢或社區議題，願意貢獻自己的心力參與服務學習，展現極佳的同理心與利他精神/g, "熱心關懷弱勢及社區，具備極佳同理心與利他心")
-      .replace(/對於公共事務或服務學習的參與度較為被動，同理他人的能力與主動關懷社會的熱情可再多加引導/g, "服務學習參與度被動，同理與社會關懷待加強")
-      
-      .replace(/能透過興趣測驗與職業探索，清楚分析自己的優勢與性向，並能對未來（國中階段）訂定具體的學習或發展目標/g, "熟知性向與個人優勢，能設定具體升學目標")
-      .replace(/對自己的興趣傾向與未來志向較感迷惘，缺乏明確的目標設定，建議多帶領其認識各行各業的故事/g, "生涯規劃較迷惘，宜引導了解多元職業")
-      .replace(/能用心回顧小學六年的成長歷程，並透過具體行動（如卡片、影片或展演）向師長、同學與家人表達深刻的感恩之情/g, "用心回顧成長，並主動以卡片影片表達感恩")
-      .replace(/對於畢業回顧與感恩活動的投入程度不高，較難以言語或行動具體表達對他人的感謝/g, "畢業感恩活動投入不足，感恩心意有待引導")
-      .replace(/能靈活運用六年來所學的各項技能（如資料統整、簡報製作、團隊溝通），在畢業專題發表上展現穩健大方的台風與卓越的統整力/g, "靈活運用多元技能發表，端莊穩健且富有統整力")
-      .replace(/在最終的專題統整與口頭發表時，資料組織能力稍弱，公開發表的自信心與口語表達技巧需再加強/g, "終端報告組織稍慢，上台口語發表自信待輔助")
+      .replace(/能熟練求出扇形面積、複合圖形面積與圓心角/g, "熟練求扇形、複合面積及圓心角")
+      .replace(/面對同儕意見衝突時容易情緒化或選擇逃避，在團隊中承擔責任的積極度尚有進步空間/g, "面對衝突易情緒化或逃避，團隊積極度待加強")
       
       // Health Long Phrases
-      .replace(/能正確落實潔牙、正確洗手與視力保健等生活好習慣，並能隨時注意自我坐姿與良好體態的維持/g, "落實潔牙與視力保健，維持良好坐姿體態")
-      .replace(/潔牙與視力保健等日常衛生習慣較常需要師長提醒，對於維持優良坐姿的自律性需再加強/g, "衛生與視力保健需常提醒，坐姿自律性待引導")
-      .replace(/能清楚辨識六大類食物，具備天天五蔬果與多喝白開水的良好飲食觀念，在日常生活中能做到不挑食/g, "辨識六大食物且不挑食，富蔬果與多喝水概念")
-      .replace(/偏食現象較明顯，對零食或含糖飲料的抗拒能力較弱，需多引導其建立均衡飲食的防護觀/g, "偏食與零食抗拒力弱，需引導建立均衡飲食觀")
-      .replace(/具備良好的身體自主權概念（身體紅綠燈），能警覺校園與居家的安全死角，並熟練掌握 119 基礎報案與求助技巧/g, "具自衛概念與安全警覺，掌握119報案技巧")
-      .replace(/日常活動中安全警覺心較不足，偶有危險行為，在面對意外受傷時的緊急求助應變力仍需引導/g, "安全警覺心不足，意外受傷求助應變力需多引導")
-      .replace(/在購買食品時能主動閱讀營養標示與成分，具備優異的健康消費知能，並能認明綠色食品標章/g, "主動閱讀食品營養標示，具良好綠色消費知能")
-      .replace(/消費時多僅依個人喜好選擇，缺乏看懂食品或營養標示的習慣，健康消費意識有待引導/g, "消費多依喜好，解讀標籤與健康消費意識待啟發")
-      .replace(/清楚了解流感、登革熱等校園與社區常見傳染病的傳播途徑，並能主動配合各項防疫与環境衛生措施/g, "清楚常見傳染病傳播途徑，積極落實防疫措施")
-      .replace(/對傳染病（如流感）的防疫概念較被動，平時需多提醒其落實個人防護與衛生宣導/g, "防範傳染病觀念較被動，個人衛生需多督導")
-      .replace(/能敏銳覺察自己的情緒與日常壓力，並能運用適當、正向的方式（如運動、傾訴）進行情緒抒解與人際溝通/g, "覺察壓力情緒能妙招抒解，溝通管道多元健康")
-      .replace(/面對挫折或人際壓力時容易出現負面情緒或生悶氣，情緒管理與尋求正向抒解管道的能力需多輔導/g, "遇壓易生悶氣，情緒自處與正向抒解待多引導")
-      .replace(/能以正向、健康的態度理解青春期第二性徵與生理變化（月經、遺精），破除性別刻板印象，並展現高度的跨性別尊重與平權觀念/g, "正視青春期第二性徵生理變化，極富平權尊重")
-      .replace(/對於青春期的生理變化容易感到害羞或開玩笑，在尊重男女生理差異與性別平等的觀念上需再深化/g, "對生理變遷害羞，男女尊重的教育觀念需再強化")
-      .replace(/對於菸害、電子菸、檳榔及毒品的危害有深刻認知，並熟練掌握人際交往中的「拒絕技巧」，展現堅定的反毒防毒態度/g, "深知菸毒危害並善用拒絕技巧，拒毒立場極堅定")
-      .replace(/面對同儕同儕團體壓力時，拒絕不良嗜好（如不良飲食或含糖飲料誘惑）的意志力較為薄弱，需加強自我肯定技能/g, "面對同儕壓力拒絕意志薄弱，需強化自我肯定力")
-      .replace(/理解肥胖、近視、糖尿病等現代生活型態慢性病的成因，能主動控制螢幕時間並規劃規律運動，具備優秀的健康自主管理力/g, "深明多種慢性病防範，能自控螢幕並維持運動")
-      .replace(/數位產品螢幕使用時間過長，缺乏規律運動的習慣，在防範現代慢性病的作息調整上需多加督促/g, "螢幕用度稍長，規律作息與現代防病觀需再引導")
-      .replace(/熟練掌握心肺復甦術（CPR）與 AED 的操作流程與救人觀念，面對地震或颱風等災害時具備冷靜的應變心態/g, "熟練CPR及AED流程，面對天災能保持冷靜應變")
-      .replace(/在急救演練時的專注度與動作精準度稍弱，需多加複習 CPR\+AED 的關鍵救援步驟以防不時之需/g, "急救演練動作稍生疏，宜多複習急救關鍵步驟")
-      .replace(/具備良好的健康資訊判讀能力，能理性辨識醫療或藥物詐騙陷阱，建立正確的就醫、用藥常識與消費者防護權益/g, "明辨醫藥詐騙，建立正確求醫與健康資訊判讀")
-      .replace(/對於網路上氾濫的健康謠言或不實醫藥資訊缺乏思辨力，需培養尋求正確醫療管道與求證的習慣/g, "對網路醫藥謠言思辨力弱，宜引導依循正確求醫")
-      .replace(/能理解全球暖化（如熱傷害預防、新興傳染病）對人類健康的威脅，並能在生活中積極推動並實踐促進社區健康的綠色行動/g, "知曉氣候變遷與熱傷害威脅，積極推動社區綠能")
-      .replace(/對於氣候變遷帶來的健康危害（如熱射病防範）認識不足，對於環境永續與個人健康連結的實踐動機可再提升/g, "氣候與熱傷害防範意識足，永續生活關聯待引導");
-
-    // 2. Shorten connecting filler words or template sentences if they take too many spaces
-    cur = cur
-      // Template connectives & transitions (Excel)
-      .replace(/表現極為卓越！平時/g, "表現優秀，平時")
-      .replace(/學習成果十分亮眼，足堪為全班同學學習的好榜樣。/g, "表現傑出可嘉。")
-      .replace(/很有心得與想法。不僅/g, "具心得與想法。不僅")
-      .replace(/展現了極高的自我要求，表現讓人非常讚賞。/g, "自我要求高，表現可嘉。")
-      .replace(/展現卓越的學習成效，日常/g, "展現極佳成效，日常")
-      .replace(/是個資質優秀且懂事聽話的好孩子。/g, "質優且聽話。")
-      .replace(/表現極佳，平常/g, "表現極佳，")
-      .replace(/的情形，各項成效定能臻於完美，加油！/g, "以利臻於完美。")
-      .replace(/具有極佳天賦與熱情，平日/g, "極具天賦熱情，")
-      .replace(/之處，表現將更無懈可擊。/g, "之處則能更為亮眼。")
-      .replace(/展現優秀底子，日常/g, "具優秀底子，")
-      .replace(/的狀況。讓我們一起加強訓練，打好底子。/g, "，期待能重整步伐、打好基礎。")
-      .replace(/雖然目前在...發揮不夠平穩/g, "雖不夠平穩")
-      .replace(/在...的基礎未臻穩固/g, "基礎尚待加強")
-
-      // Template connectives & transitions (Diligent)
-      .replace(/學習態度誠懇端正，平時/g, "學習誠懇，平日")
-      .replace(/是個踏實且讓人放心的好孩子。/g, "行事踏實放心。")
-      .replace(/做事安分守己。不僅/g, "做事盡責。不只")
-      .replace(/課堂作業與練習也是一絲不苟，默默努力的態度很值得肯定。/g, "作業一絲不苟，值得稱。")
-      .replace(/行事沉著穩重，課堂上常能/g, "沉著穩重，常能")
-      .replace(/各項學習成果紮實可靠。請繼續維持下去喔！/g, "成果紮實，請繼續保持。")
-      .replace(/學習...態度認真穩健，平日/g, "態度認真，")
-      .replace(/上有些吃力，相信能靠著毅力克服！/g, "稍吃力，盼能持之以恆。")
-      .replace(/課堂若能克服/g, "若克服")
-      .replace(/的困擾，表現定能大有突破。/g, "，表現定更大有突破。")
-      .replace(/在...常規良好/g, "常規良好")
-
-      // Template connectives & transitions (Improved)
-      .replace(/這學期進步幅度讓人驚艷！平時不只/g, "這學期進步大，不僅")
-      .replace(/，學習信心也與日俱增，請維持這股熱情努力！/g, "，信心也提升不少。")
-      .replace(/展現了強大的自我突破精神。日常在/g, "具自我突破精神，在")
-      .replace(/精益求精，學習態度也有明顯好轉，表現非常棒。/g, "精益求精，表現十分優異。")
-      .replace(/最近在...展現驚人的成長！已能確實做到/g, "近期成長顯著，已能完成")
-      .replace(/上的瓶頸也大幅改善，請繼續加油！/g, "，原瓶頸也獲改善，加油。")
-      .replace(/這學期在...課堂展現極大進步。日常不僅/g, "本學期進步多，平日不合")
-
-      // Template connectives & transitions (Inspiring Style)
-      .replace(/學習...得心應手，平時/g, "學習順暢，平時")
-      .replace(/。若能改善/g, "，若改進")
-      .replace(/，定能更加卓越。/g, "定更卓越。")
-      .replace(/上課表現佳，平時能/g, "上課極佳，能")
-      .replace(/。若在...上微調步伐，期許未來展現更棒的實力。/g, "，若能微調步伐定有佳績。")
-      .replace(/在...表現棒極了！不僅/g, "表現極棒，不僅")
-      .replace(/，學習態度積極，可以當大家學習的好榜樣！/g, "，積極學習能為同儕榜樣。")
-      .replace(/學得很有心得。平日/g, "學得極佳，平日")
-      .replace(/，追求進步且自我要求高，請繼續保持下去。/g, "，自我要求高，請維持。")
-      .replace(/學習...成效極佳。不但/g, "成效優質。不只")
-      .replace(/，表現更是令人激賞，是非常優秀懂事的好孩子。/g, "，表現亮眼，十分懂事。")
-
-      // Template connectives & transitions (Gentle Style)
-      .replace(/學習...很踏實，能做到/g, "學習踏實，能完成")
-      .replace(/。雖偶爾/g, "，雖偶有")
-      .replace(/，老師會陪著你一起努力。/g, "，老師會陪伴你努力。")
-      .replace(/上...認真，平常/g, "課堂用心，平時")
-      .replace(/。若能慢慢修正/g, "，若修正")
-      .replace(/，進步會更顯著喔。/g, "則進步更多。")
-      .replace(/學...態度溫和，能/g, "態度溫和，")
-      .replace(/。若在...上多花點心思就更好了。/g, "，若能多加留心就更棒。")
-      .replace(/學習...態度端正。平時/g, "態度端正，平時")
-      .replace(/，穩步前行是個讓師長放心的好孩子。/g, "，穩健前行使人放心。")
-      .replace(/上課總是用心，不僅/g, "上課用心，不只")
-      .replace(/，能做好本分非常不容易，表現值得肯定。/g, "，本分維持得宜，值得稱許。")
-      .replace(/在...表現平穩。平時能/g, "表現平穩，能")
-      .replace(/，整體成果令人欣慰，請繼續維持。/g, "，成果合度，請維持。")
-
-      // Template connectives & transitions (Growth Style)
-      .replace(/在學習...的旅程中進步許多，平日/g, "學習上進步著，平日")
-      .replace(/，這是非常了不起的突破。/g, "，實屬可喜的進步。")
-      .replace(/我們常在課堂看見在/g, "課堂常見他在")
-      .replace(/。雖然偶有/g, "，雖偶伴有")
-      .replace(/等考驗，但他勇敢重整旗鼓，態度可嘉。/g, "，但他仍勇於面對。");
+      .replace(/能正確落實潔牙、正確洗手與視力保健等生活好習慣，並能隨時注意自我坐姿與良好體態的維持/g, "能落實潔牙、洗手與視力保健，維持好體態")
+      .replace(/潔牙與視力保健等日常衛生習慣較常需要師長提醒，對於維持優良坐姿的自律性需再加強/g, "日常習慣需提醒，且坐姿維持自律待加強")
+      .replace(/能清楚辨識六大類食物，具備天天五蔬果與多喝白開水的良好飲食觀念，在日常生活中能做到不挑食/g, "能辨識六大類食物且不偏食，具均衡飲食觀")
+      .replace(/偏食現象較明顯，對零食或含糖飲料的抗拒能力較弱，需多引導其建立均衡飲食的防護觀/g, "偏食且易吃含糖零食，待引導均衡飲食觀")
+      .replace(/具備良好的身體自主權概念（身體紅綠燈），能警覺校園與居家的安全死角/g, "具備身體自主權與紅綠燈概念，警覺安全死角");
 
     return cur;
   };
 
-  const sanitizePunctuation = (str: string): string => {
-    return str
-      .replace(/，，/g, '，')
-      .replace(/、、/g, '、')
-      .replace(/。。/g, '。')
-      .replace(/，。/g, '。')
-      .replace(/。，/g, '。')
-      .replace(/、，/g, '，')
-      .replace(/，、/g, '、')
-      .replace(/且且/g, '且')
-      .replace(/並並/g, '並')
+  const sanitizePunctuation = (text: string): string => {
+    return text
+      .substring(0) // Safe copy
+      .replace(/，，/g, "，")
+      .replace(/。。/g, "。")
+      .replace(/、、/g, "、")
+      .replace(/, /g, "，")
+      .replace(/！。/g, "！")
       .trim();
   };
 
   const adaptToGradeVocabulary = (text: string, grade: string): string => {
-    if (grade === '1' || grade === '2') {
-      return text
-        .replace(/思辨/g, "思考")
-        .replace(/寫作架構/g, "造句寫作")
-        .replace(/文本/g, "課文與故事")
-        .replace(/抽象概念/g, "生活概念")
-        .replace(/同儕/g, "同學")
-        .replace(/研討/g, "一起學習")
-        .replace(/史地脈絡/g, "生活周遭事物")
-        .replace(/Google 雲端工具/g, "電腦 Google 軟體")
-        .replace(/文書編排/g, "電腦打字");
+    let cur = text;
+    if (grade === '3' || grade === '4') {
+      cur = cur
+        .replace(/資質優秀/g, "表現優秀")
+        .replace(/治學/g, "學習")
+        .replace(/領悟力/g, "理解力")
+        .replace(/同儕/g, "同學");
     }
-    if (grade === '5' || grade === '6') {
-      return text
-        .replace(/同學/g, "同儕")
-        .replace(/生字書寫/g, "字音字形與生字書寫")
-        .replace(/課本單元/g, "領域主題專案");
-    }
-    return text;
+    return cur;
   };
 
-  // Compile active checked dimensions into positive, neutral and negative chunks
   const compiledGroups = useMemo(() => {
-    const activeChecked = checkedDimensions[currentSubject] || [];
     const positives: string[] = [];
     const neutrals: string[] = [];
     const negatives: string[] = [];
 
-    activeChecked.slice(0, 4).forEach(item => {
+    const activeList = (checkedDimensions[currentSubject] as any) || [];
+
+    // Checked standard dimensions
+    const activeChecked = activeList.filter((item: any) => !item.id.startsWith('custom_'));
+
+    activeChecked.slice(0, 4).forEach((item: any) => {
+      const fragment = getFragmentText(item.id, item.level);
+      if (!fragment) return;
+      if (item.level === 'high') {
+        positives.push(fragment);
+      } else if (item.level === 'mid') {
+        neutrals.push(fragment);
+      } else {
+        negatives.push(fragment);
+      }
+    });
+
+    // Custom dimensions
+    const activeCustom = activeList.filter((item: any) => item.id.startsWith('custom_'));
+
+    activeCustom.forEach((item: any) => {
       const fragment = getFragmentText(item.id, item.level);
       if (!fragment) return;
       if (item.level === 'high') {
