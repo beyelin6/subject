@@ -2,46 +2,46 @@ import { Dimension } from '../types';
 
 export const CHINESE_DIMENSIONS: Record<string, Dimension[]> = {
   "1": [
-    { id: "phonics", name: "🗣️ 注音符號拼讀與聽寫（拼音/聲調訓練）", labels: { high: "🟢 注音拼讀準確流暢", mid: "🟡 能拼讀課本拼音", low: "🔴 注音常拼錯、聽寫慢" } },
-    { id: "characters", name: "📖 常用漢字認讀與識字（認讀/認字量）", labels: { high: "🟢 識字量大認讀快", mid: "🟡 能認讀課本內生字", low: "🔴 常用字詞常認錯" } },
-    { id: "stroke_order", name: "✏️ 握筆姿勢與基本筆畫（筆順/硬筆基礎）", labels: { high: "🟢 握筆端正筆順正確", mid: "🟡 能大致按筆順寫字", low: "🔴 握筆偏低、寫字常錯" } },
-    { id: "reading_aloud", name: "🗣️ 課文朗讀與口語發表（看圖說話/流暢度）", labels: { high: "🟢 朗讀聲調優美有感情", mid: "🟡 能跟讀課文並簡單回答", low: "🔴 朗讀易漏字或不敢發表" } },
-    { id: "attitude", name: "💡 國語學習興趣與常規配合", labels: { high: "🟢 上課專注作業極優", mid: "🟡 能乖巧寫完每日功課", low: "🔴 寫功課比較急躁分心" } }
+    { id: "phonics", name: "🗣️ 注音符號拼讀訓練", labels: { high: "🟢 注音拼讀準確流暢", mid: "🟡 能拼讀課本拼音", low: "🔴 注音常拼錯、聽寫慢" } },
+    { id: "characters", name: "📖 常用漢字識字量", labels: { high: "🟢 識字量大認讀快", mid: "🟡 能認讀課本內生字", low: "🔴 常用字詞常認錯" } },
+    { id: "stroke_order", name: "✏️ 握筆姿勢與筆順練習", labels: { high: "🟢 握筆端正筆順正確", mid: "🟡 能大致按筆順寫字", low: "🔴 握筆偏低、寫字常錯" } },
+    { id: "reading_aloud", name: "🗣️ 課文朗讀與發表", labels: { high: "🟢 朗讀聲調優美有感情", mid: "🟡 能跟讀課文並簡單回答", low: "🔴 朗讀易漏字 or 不敢發表" } },
+    { id: "attitude", name: "💡 國語課堂學習興趣", labels: { high: "🟢 上課專注作業極優", mid: "🟡 能乖巧寫完每日功課", low: "🔴 寫功課比較急躁分心" } }
   ],
   "2": [
-    { id: "stroke_order_2", name: "✏️ 生字部首結構與硬筆書寫（字形/部首）", labels: { high: "🟢 部首字形端正精準", mid: "🟡 字體大致端正工整", low: "🔴 常漏寫筆劃、字跡偏亂" } },
-    { id: "phrases", name: "✍️ 詞彙造詞與短句仿寫（造局/詞庫擴充）", labels: { high: "🟢 造詞豐富造句有創意", mid: "🟡 能通順仿寫短句", low: "🔴 詞彙量少造句不完整" } },
-    { id: "ext_reading", name: "📖 故事聆聽理解與看圖解說（摘要/口說）", labels: { high: "🟢 閱讀理解力與發表佳", mid: "🟡 能在提示下答故事主旨", low: "🔴 聽長篇故事易恍神" } },
-    { id: "radical_concept", name: "🔍 部首概念與字義關聯理解（部首辨識）", labels: { high: "🟢 部首概念極熟能舉一反三", mid: "🟡 認識常用部首與基本意涵", low: "🔴 部首混淆常查錯分類" } },
-    { id: "attitude", name: "💡 國語學科學習與作業訂正", labels: { high: "🟢 作業工整且用心訂正", mid: "🟡 能按時繳交作業完成", low: "🔴 作業書寫不夠細緻常漏" } }
+    { id: "stroke_order_2", name: "✏️ 生字結構與硬筆書寫", labels: { high: "🟢 部首字形端正精準", mid: "🟡 字體大致端正工整", low: "🔴 常漏寫筆劃、字跡偏亂" } },
+    { id: "phrases", name: "✍️ 詞彙造字與造詞", labels: { high: "🟢 造詞豐富造句有創意", mid: "🟡 能通順仿寫短句", low: "🔴 詞彙量少造句不完整" } },
+    { id: "ext_reading", name: "📖 故事聆聽與理解", labels: { high: "🟢 閱讀理解力與發表佳", mid: "🟡 能在提示下答故事主旨", low: "🔴 聽長篇故事易恍神" } },
+    { id: "radical_concept", name: "🔍 部首與字義關聯理解", labels: { high: "🟢 部首概念極熟能舉一反三", mid: "🟡 認識常用部首與基本意涵", low: "🔴 部首混淆常查錯分類" } },
+    { id: "attitude", name: "💡 課後作業訂正習慣", labels: { high: "🟢 作業工整且用心訂正", mid: "🟡 能按時繳交作業完成", low: "🔴 作業書寫不夠細緻常漏" } }
   ],
   "3": [
-    { id: "paragraph", name: "✍️ 段落寫作與完整造句（短文/標點練習）", labels: { high: "🟢 段落通順結構完整", mid: "🟡 能寫出基本通順短文", low: "🔴 段落語句破碎常用口語" } },
-    { id: "dictionary", name: "🔍 字典檢索與字音字形辨析（查字/形近字）", labels: { high: "🟢 查字典熟練字音極熟", mid: "🟡 能順利查字找出解釋", low: "🔴 拼音或部首查字典較慢" } },
-    { id: "reading_comprehension", name: "📖 課文情節理解與重點摘要（閱讀策略）", labels: { high: "🟢 能迅速抓出課文大意", mid: "🟡 引導下可說出課文情節", low: "🔴 文本段落理解較吃力" } },
-    { id: "rhetoric_intro", name: "📝 基礎修辭賞析與句型練習（譬喻/擬人）", labels: { high: "🟢 巧妙融入修辭句型精湛", mid: "🟡 能理解並套用基礎修辭", low: "🔴 句子結構單一或常有語病" } },
-    { id: "attitude", name: "💡 國語課堂參與及聽講專注", labels: { high: "🟢 作業用心、主動閱讀", mid: "🟡 作業平實完成無違規", low: "🔴 課堂聽講定性需加強" } }
+    { id: "paragraph", name: "✍️ 段落寫作與造句", labels: { high: "🟢 段落通順結構完整", mid: "🟡 能寫出基本通順短文", low: "🔴 段落語句破碎常用口語" } },
+    { id: "dictionary", name: "🔍 字典檢索與查字", labels: { high: "🟢 查字典熟練字音極熟", mid: "🟡 能順利查字找出解釋", low: "🔴 拼音或部首查字典較慢" } },
+    { id: "reading_comprehension", name: "📖 課文情節理解與大意", labels: { high: "🟢 能迅速抓出課文大意", mid: "🟡 引導下可說出課文情節", low: "🔴 文本段落理解較吃力" } },
+    { id: "rhetoric_intro", name: "📝 基礎修辭賞析與練習", labels: { high: "🟢 巧妙融入修辭句型精湛", mid: "🟡 能理解並套用基礎修辭", low: "🔴 句子結構單一或常有語病" } },
+    { id: "attitude", name: "💡 國語課堂聽講專注度", labels: { high: "🟢 作業用心、主動閱讀", mid: "🟡 作業平實完成無違規", low: "🔴 課堂聽講定性需加強" } }
   ],
   "4": [
-    { id: "narrative", name: "✍️ 記敘文段落佈局與起承轉合（作文）", labels: { high: "🟢 修辭豐富段落佈局優", mid: "🟡 能按起承轉合寫記敘文", low: "🔴 修辭單調、字數較零碎" } },
-    { id: "idioms", name: "📝 成語運用與句型擴寫（成語/造句擴充）", labels: { high: "🟢 成語運用精當句型多樣", mid: "🟡 能妥善運用基礎成語", low: "🔴 成語意思常混淆、句子單薄" } },
-    { id: "long_reading", name: "📖 長文自主閱讀理解與摘要（多版本閱讀）", labels: { high: "🟢 閱讀理解快且能抓重點", mid: "🟡 能讀懂中長篇文章", low: "🔴 長文閱讀時易分心馬虎" } },
-    { id: "writing_detail", name: "✏️ 標點精準度與錯別字更正（精緻描寫）", labels: { high: "🟢 字形與標點運用極少出錯", mid: "🟡 書寫工整、錯字大體能更正", low: "🔴 常見錯別字多且標點混亂" } },
-    { id: "attitude", name: "💡 國語學習熱忱與發表自信", labels: { high: "🟢 主動挑戰延伸寫作", mid: "🟡 按部就班配合教學", low: "🔴 學習心態偏於被動" } }
+    { id: "narrative", name: "✍️ 記敘文寫作結構", labels: { high: "🟢 修辭豐富段落佈局優", mid: "🟡 能按起承轉合寫記敘文", low: "🔴 修辭單調、字數較零碎" } },
+    { id: "idioms", name: "📝 成語理解與運用", labels: { high: "🟢 成語運用精當句型多樣", mid: "🟡 能妥善運用基礎成語", low: "🔴 成語意思常混淆、句子單薄" } },
+    { id: "long_reading", name: "📖 長文自主閱讀理解", labels: { high: "🟢 閱讀理解快且能抓重點", mid: "🟡 能讀懂中長篇文章", low: "🔴 長文閱讀時易分心馬虎" } },
+    { id: "writing_detail", name: "✏️ 錯別字辨識與更正", labels: { high: "🟢 字形与標點運用極少出錯", mid: "🟡 書寫工整、錯字大體能更正", low: "🔴 常見錯別字多且標點混亂" } },
+    { id: "attitude", name: "💡 國語學習主動性", labels: { high: "🟢 主動挑戰延伸寫作", mid: "🟡 按部就班配合教學", low: "🔴 學習心態偏於被動" } }
   ],
   "5": [
-    { id: "expository", name: "✍️ 說明文要素與議論文撰寫（思辨寫作）", labels: { high: "🟢 論點清晰且論證合理", mid: "🟡 能分段並說明基本觀點", low: "🔴 說明混亂、論據不夠充分" } },
-    { id: "classical", name: "📜 文言字詞與經典文學賞析（白話/注釋）", labels: { high: "🟢 文言文語譯理解極佳", mid: "🟡 能讀懂白話譯文與常識", low: "🔴 對文言字詞語譯感到頭痛" } },
-    { id: "critical_thinking", name: "💡 文本批判思辨、提問與省思（深究）", labels: { high: "🟢 思辨敏捷能主動質疑提問", mid: "🟡 能回答有深度的課文提問", low: "🔴 回答問題較為被動或敷衍" } },
-    { id: "speed_reading", name: "📖 快速閱讀與多重文本比對（閱讀自學）", labels: { high: "🟢 跨篇章資料整合極具條理", mid: "🟡 能完成兩篇短文的比較重點", low: "🔴 面對複雜資料整合較為吃力" } },
-    { id: "attitude", name: "💡 語文自主學習與預習札記", labels: { high: "🟢 學習極主動、閱讀面廣", mid: "🟡 確實做好預習與課堂筆記", low: "🔴 作業需師長多次催促繳交" } }
+    { id: "expository", name: "✍️ 說明文要素與寫作", labels: { high: "🟢 論點清晰且論證合理", mid: "🟡 能分段並說明基本觀點", low: "🔴 說明混亂、論據不夠充分" } },
+    { id: "classical", name: "📜 文言文句意理解", labels: { high: "🟢 文言文語譯理解極佳", mid: "🟡 能讀懂白話譯文與常識", low: "🔴 對文言字詞語譯感到頭痛" } },
+    { id: "critical_thinking", name: "💡 文本批判思辨與深究", labels: { high: "🟢 思辨敏捷能主動質疑提問", mid: "🟡 能回答有深度的課文提問", low: "🔴 回答問題較為被動或敷衍" } },
+    { id: "speed_reading", name: "📖 快速閱讀與資訊檢索", labels: { high: "🟢 跨篇章資料整合極具條理", mid: "🟡 能完成兩篇短文的比較重點", low: "🔴 面對複雜資料整合較為吃力" } },
+    { id: "attitude", name: "💡 語文自主學習態度", labels: { high: "🟢 學習極主動、閱讀面廣", mid: "🟡 確實做好預習與課堂筆記", low: "🔴 作業需師長多次催促繳交" } }
   ],
   "6": [
-    { id: "grad_writing", name: "✍️ 畢業感懷與抒情主題深度寫作（心靈感悟）", labels: { high: "🟢 文筆深刻、富含感悟思想", mid: "🟡 結構完整能寫出畢業感懷", low: "🔴 寫作字數偏少、內容較空洞" } },
-    { id: "rhetoric", name: "📝 修辭多變融會與用字文采（綜合展現）", labels: { high: "🟢 修辭高妙、成語信手拈來", mid: "🟡 句型多變且用字通順", low: "🔴 詞庫貧乏、常有語句重複" } },
-    { id: "cross_domain", name: "📖 跨領域長文分析與生活應用（統整閱讀）", labels: { high: "🟢 跨文本資訊統整能力極佳", mid: "🟡 能整合多方資料進行摘要", low: "🔴 長文本分析與統整速度慢" } },
-    { id: "project_presentation", name: "🗣️ 主題專案報告撰寫與口頭發表（簡報/報告）", labels: { high: "🟢 簡報結構邏輯極優且口談落落大方", mid: "🟡 能完成口頭報告的基本內容", low: "🔴 上台發表時表現較為緊繃怯場" } },
-    { id: "attitude", name: "💡 畢業專案自主規劃與自我負責度", labels: { high: "🟢 自主規劃能力好、極負責", mid: "🟡 本分工作皆主動做好", low: "🔴 做事拖沓需要多次提醒" } }
+    { id: "grad_writing", name: "✍️ 畢業感懷寫作", labels: { high: "🟢 文筆深刻、富含感悟思想", mid: "🟡 結構完整能寫出畢業感懷", low: "🔴 寫作字數偏少、內容較空洞" } },
+    { id: "rhetoric", name: "📝 多變修辭融會與應用", labels: { high: "🟢 修辭高妙、成語信手拈來", mid: "🟡 句型多變且用字通順", low: "🔴 詞庫貧乏、常有語句重複" } },
+    { id: "cross_domain", name: "📖 跨領域長文分析", labels: { high: "🟢 跨文本資訊統整能力極佳", mid: "🟡 能整合多方資料進行摘要", low: "🔴 長文本分析與統整速度慢" } },
+    { id: "project_presentation", name: "🗣️ 主題專案報告發表", labels: { high: "🟢 簡報結構邏輯極優且口談落落大方", mid: "🟡 能完成口頭報告的基本內容", low: "🔴 上台發表時表現較為緊繃怯場" } },
+    { id: "attitude", name: "💡 畢業專案負責態度", labels: { high: "🟢 自主規劃能力好、極負責", mid: "🟡 本分工作皆主動做好", low: "🔴 做事拖沓需要多次提醒" } }
   ]
 };
 
