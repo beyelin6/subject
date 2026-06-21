@@ -5,7 +5,14 @@ import { MATH_DIMENSIONS, MATH_FRAGMENTS } from './data/math';
 import { SOCIAL_DIMENSIONS, SOCIAL_FRAGMENTS } from './data/social';
 import { ENGLISH_DIMENSIONS, ENGLISH_FRAGMENTS } from './data/english';
 import { SCIENCE_DIMENSIONS, SCIENCE_FRAGMENTS } from './data/science';
-import { OTHERS_DIMENSIONS, OTHERS_FRAGMENTS } from './data/others';
+import { LIFE_DIMENSIONS, LIFE_FRAGMENTS } from './data/life';
+import { HEALTH_DIMENSIONS, HEALTH_FRAGMENTS } from './data/health';
+import { PE_DIMENSIONS, PE_FRAGMENTS } from './data/pe';
+import { FINEART_DIMENSIONS, FINEART_FRAGMENTS } from './data/fineart';
+import { MUSIC_DIMENSIONS, MUSIC_FRAGMENTS } from './data/music';
+import { LOCAL_DIMENSIONS, LOCAL_FRAGMENTS } from './data/local';
+import { GENERAL_SUBJECT_DIMENSIONS, GENERAL_SUBJECT_FRAGMENTS } from './data/general';
+import { TECH_DIMENSIONS, TECH_FRAGMENTS } from './data/tech';
 
 export { GRADE_SUBJECTS, GENERAL_DIMENSIONS };
 
@@ -15,14 +22,14 @@ export const SUBJECT_DIMENSIONS: Record<SubjectKey, Record<string, Dimension[]>>
   social: SOCIAL_DIMENSIONS,
   english: ENGLISH_DIMENSIONS,
   science: SCIENCE_DIMENSIONS,
-  life: OTHERS_DIMENSIONS.life,
-  health: OTHERS_DIMENSIONS.health,
-  pe: OTHERS_DIMENSIONS.pe,
-  fineart: OTHERS_DIMENSIONS.fineart,
-  music: OTHERS_DIMENSIONS.music,
-  local: OTHERS_DIMENSIONS.local,
-  general: OTHERS_DIMENSIONS.general,
-  tech: OTHERS_DIMENSIONS.tech
+  life: LIFE_DIMENSIONS,
+  health: HEALTH_DIMENSIONS,
+  pe: PE_DIMENSIONS,
+  fineart: FINEART_DIMENSIONS,
+  music: MUSIC_DIMENSIONS,
+  local: LOCAL_DIMENSIONS,
+  general: GENERAL_SUBJECT_DIMENSIONS,
+  tech: TECH_DIMENSIONS
 };
 
 export const FRAGMENTS: Record<string, any> = {
@@ -32,12 +39,13 @@ export const FRAGMENTS: Record<string, any> = {
   social: SOCIAL_FRAGMENTS,
   english: ENGLISH_FRAGMENTS,
   science: SCIENCE_FRAGMENTS,
-  life: OTHERS_FRAGMENTS.life,
-  health: OTHERS_FRAGMENTS.health,
-  pe: OTHERS_FRAGMENTS.pe,
-  fineart: OTHERS_FRAGMENTS.fineart,
-  music: OTHERS_FRAGMENTS.music,
-  local: OTHERS_FRAGMENTS.local,
-  general: OTHERS_FRAGMENTS.general,
-  tech: OTHERS_FRAGMENTS.tech
+  life: LIFE_FRAGMENTS,
+  health: HEALTH_FRAGMENTS,
+  pe: PE_FRAGMENTS,
+  fineart: FINEART_FRAGMENTS,
+  music: MUSIC_FRAGMENTS,
+  local: LOCAL_FRAGMENTS,
+  general: GENERAL_SUBJECT_FRAGMENTS,
+  tech: TECH_FRAGMENTS
 };
+
