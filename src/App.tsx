@@ -49,7 +49,7 @@ export default function App() {
   const [checkedDimensions, setCheckedDimensions] = useState<Record<string, CheckedDimension[]>>({});
 
   // Generators layout or settings states
-  const [generatorMode, setGeneratorMode] = useState<'archetypes' | 'styles'>('archetypes');
+  const [generatorMode, setGeneratorMode] = useState<'archetypes' | 'styles'>('styles');
   const [isConciseMode, setIsConciseMode] = useState(true);
   const [variationSeeds, setVariationSeeds] = useState<Record<string, number>>({});
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
@@ -1481,20 +1481,14 @@ export default function App() {
       const adaptedNeutrals = adaptPhrasingForType(compiledGroups.neutrals, key, 'pos');
       const adaptedNegatives = adaptPhrasingForType(compiledGroups.negatives, key, 'neg');
 
-      const isMatched = generatorMode === 'archetypes' 
-        ? typicalLabels.includes(key)
-        : typicalLabels.some(archetypeKey => ARCHETYPE_TO_STYLE[archetypeKey] === key);
-
-      let assembled = "";
-      if (isMatched) {
-        assembled = compileAdvancedRhetoricComment(
-          key,
-          adaptedPositives,
-          adaptedNeutrals,
-          adaptedNegatives,
-          subjectLabel
-        );
-      } else {
+      let assembled = compileAdvancedRhetoricComment(
+        key,
+        adaptedPositives,
+        adaptedNeutrals,
+        adaptedNegatives,
+        subjectLabel
+      );
+      if (!assembled) {
         assembled = templateObj.compile(
           adaptedPositives,
           adaptedNeutrals,
