@@ -41,6 +41,7 @@ export default function App() {
   const [pronoun, setPronoun] = useState<'he' | 'she' | 'none'>('he');
   const [currentGrade, setCurrentGrade] = useState('3');
   const [currentSubject, setCurrentSubject] = useState<SubjectKey>('chinese');
+  const [praiseOnly, setPraiseOnly] = useState(false);
   
   // Custom indicator dimensions
   const [customDimensions, setCustomDimensions] = useState<Record<string, CustomDimension[]>>({});
@@ -97,6 +98,7 @@ export default function App() {
       setStudentName(activeStudent.name);
       setPronoun(activeStudent.pronoun);
       setCurrentGrade(activeStudent.grade);
+      setPraiseOnly(!!activeStudent.praiseOnly);
       
       // Load student's saved indicators if they exist
       if (activeStudent.checkedDimensions) {
@@ -124,13 +126,22 @@ export default function App() {
     localStorage.setItem('school_students_roster_v3', JSON.stringify(nextStudents));
   };
 
+  const handlePraiseOnlyChange = (val: boolean) => {
+    setPraiseOnly(val);
+    setEditedTexts({});
+    if (activeStudent) {
+      syncStudentToRoster({ praiseOnly: val });
+    }
+  };
+
   // Quick preset loader (boy, girl, general terms)
   const applyPresetName = (name: string, pType: 'he' | 'she' | 'none') => {
     setStudentName(name);
     setPronoun(pType);
+    setPraiseOnly(false);
     setEditedTexts({}); // reset manual edits on name changes
     if (activeStudent) {
-      syncStudentToRoster({ name, pronoun: pType });
+      syncStudentToRoster({ name, pronoun: pType, praiseOnly: false });
     }
     triggerToast(`已套用快捷預設：${name} (${pType === 'he' ? '男生' : pType === 'she' ? '女生' : '通用稱謂'})`, 'info');
   };
@@ -702,6 +713,81 @@ export default function App() {
     return '';
   };
 
+  const compilePraiseOnlyComment = (
+    key: string,
+    pos: string[],
+    neu: string[],
+    sub: string
+  ): string => {
+    const allParts = [...pos, ...neu];
+    
+    // Archetype Keys templates for Outstanding/Praise-only students (完全只有讚美，零轉折、零缺點與改進)
+    if (key === 'excel') {
+      return `在${sub}領域的理解力與領悟力極其出眾，平時上課常能${smartJoin(allParts)}。學習態度認真且極具探究精神，學習成果亮眼非凡，足堪為班上的模範楷模，令人無比讚賞！`;
+    }
+    if (key === 'diligent') {
+      return `學習態度極其認真且無比踏實，平常課堂${smartJoin(allParts)}，功課也寫得極其嚴謹用心。行事有條不紊且自我要求極高，展現出無懈可擊的自律與治學態度，十分令人欽佩！`;
+    }
+    if (key === 'improved') {
+      return `這學期在${sub}學習上取得了極富成效的躍進，在課堂中更展現了卓越的理解力。平日能精準做到${smartJoin(allParts)}，自信心與各項表現皆有目共睹，進步神速，表現堪稱完美！`;
+    }
+    if (key === 'careless') {
+      return `思維極為敏捷且聰慧過人，在${sub}課堂中展現了超群的領悟力。平日學習能主動做到${smartJoin(allParts)}，各項練習皆駕輕就熟且極具靈氣，學習成效非常優異且出色！`;
+    }
+    if (key === 'passive') {
+      return `在班上溫和有禮、極守秩序。平日在${sub}學習中能極其專注地做到${smartJoin(allParts)}，默默做好自己份內的學習任務，態度成熟穩健，深得老師與同學的讚許與信賴！`;
+    }
+    if (key === 'struggling') {
+      return `學習態度積極勤勉，在${sub}學習過程中認真配合，平時能確實落實各項課堂練習，上課神情極為專注。這份持之以恆、默默付出的努力與學習風範，相當值得嘉許！`;
+    }
+    if (key === 'slowButGood') {
+      return `做事極為穩重、踏實且有耐心。課堂上精益求精，能全心投入做到${smartJoin(allParts)}。作業書寫工整、字跡秀麗，以滴水穿石的精神打下深厚基礎，表現令人萬分肯定！`;
+    }
+    if (key === 'activeDistracted') {
+      return `性格活潑開朗且極具朝氣，在${sub}課堂中積極好學，能高效率地做到${smartJoin(allParts)}。思考靈活且樂於互動，為全班帶來豐沛的正面能量，學習表現非常亮眼！`;
+    }
+    if (key === 'cooperative') {
+      return `深具熱心與團隊合作精神，在小組活動中能出色引導並帶領同儕，並在${sub}中確實做到${smartJoin(allParts)}。樂於助人且極富自律，是班上非常優秀的耀眼棟樑！`;
+    }
+    if (key === 'impatient') {
+      return `課堂表現主動積極，理解速度快，能極其敏捷地配合做好${smartJoin(allParts)}。思維靈活且作答果斷，在各項學科任務中展現出過人實力與耀眼的學習成效，十分優秀！`;
+    }
+
+    // Style Keys templates for Outstanding/Praise-only students
+    if (key === 'inspiring') {
+      return `擁有極高的學習熱忱與探究精神，日常中總能完美做到${smartJoin(allParts)}。求知慾極強，對新事物充滿好奇心，每項學術成果皆令人驚艷，充分展現出超越同齡的卓越才華！`;
+    }
+    if (key === 'gentle') {
+      return `是個溫柔、懂事且極富貼心的優秀孩子。平常在${sub}學習上能主動做到${smartJoin(allParts)}，表現卓越非凡，日常態度溫和謙遜且充滿教養，深受所有師長的喜愛與讚賞！`;
+    }
+    if (key === 'growth') {
+      return `這學期在${sub}學科領域的各項能力展現出極致優異。日常中精準落實${smartJoin(allParts)}，自主進取心旺盛，在各項學習挑戰中皆能脫穎而出，堪為班級中無比出色的領跑者！`;
+    }
+    if (key === 'academic') {
+      return `本學期在${sub}領域的學習成效極為卓越。課堂聽講高度專注，能精準且自律落實${smartJoin(allParts)}，概念理解深刻，展現了嚴謹、紮實且極具深度的高水準學術素養！`;
+    }
+    if (key === 'potential') {
+      return `大腦思維極其敏捷，擁有天賦滿滿的驚人潛力！平時在${sub}課堂中總能高標準完成${smartJoin(allParts)}，專注力極佳，卓越且聰慧的表現令人感到無比自豪與期待！`;
+    }
+    if (key === 'collaboration') {
+      return `本學期在校學習成果極佳，能出色且穩健地落實${smartJoin(allParts)}，成績始終名列前茅。感謝家長平時溫暖、高品質的陪伴引導，親師攜手共同成就孩子如此非凡亮眼的優秀表現！`;
+    }
+    if (key === 'advice') {
+      return `學科底子深厚，平常能高效率且熟練做好${smartJoin(allParts)}。學習方法科學且極具條理，理解力與概念融會貫通能力皆屬頂尖，成效極為優異，是全班效法的傑出典範！`;
+    }
+    if (key === 'steadfast') {
+      return `步伐沉穩且無比踏實！平時上課不僅完美做好${smartJoin(allParts)}，更能持之以恆、默默精進，展現了高尚的自律品質。這種堅毅、踏實且不浮躁的進取態度，難能可貴！`;
+    }
+    if (key === 'energetic') {
+      return `是全班神采奕奕的活力先鋒與靈魂人物！在${sub}課堂上總能精神飽滿地做到${smartJoin(allParts)}。學習動力極其充沛，陽光且樂觀進取的優異表現備受大家的喜愛與喝采！`;
+    }
+    if (key === 'classic') {
+      return `本學期在${sub}學科領域的學習表現堪稱楷模。上課高度專注，日常能完美落實${smartJoin(allParts)}，學習成效高超，各項作業及考評成效極佳，自律與自省態度值得高度嘉許！`;
+    }
+
+    return '';
+  };
+
   const adaptPhrasingForType = (phrases: string[], typeKey: string, level: 'pos' | 'neg'): string[] => {
     return phrases.map(phrase => {
       let res = phrase;
@@ -861,6 +947,16 @@ export default function App() {
       setStudents(defaults);
       localStorage.setItem('school_students_roster_v3', JSON.stringify(defaults));
       setActiveStudent(defaults[0]);
+    } else {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.length > 0) {
+          setStudents(parsed);
+          setActiveStudent(parsed[0]);
+        }
+      } catch (e) {
+        console.error("Error reading saved student roster on mount", e);
+      }
     }
   }, []);
 
@@ -1481,20 +1577,38 @@ export default function App() {
       const adaptedNeutrals = adaptPhrasingForType(compiledGroups.neutrals, key, 'pos');
       const adaptedNegatives = adaptPhrasingForType(compiledGroups.negatives, key, 'neg');
 
-      let assembled = compileAdvancedRhetoricComment(
-        key,
-        adaptedPositives,
-        adaptedNeutrals,
-        adaptedNegatives,
-        subjectLabel
-      );
-      if (!assembled) {
-        assembled = templateObj.compile(
+      let assembled = "";
+      if (praiseOnly || adaptedNegatives.length === 0) {
+        assembled = compilePraiseOnlyComment(
+          key,
+          adaptedPositives,
+          adaptedNeutrals,
+          subjectLabel
+        );
+        if (!assembled) {
+          assembled = templateObj.compile(
+            adaptedPositives,
+            adaptedNeutrals,
+            [],
+            subjectLabel
+          );
+        }
+      } else {
+        assembled = compileAdvancedRhetoricComment(
+          key,
           adaptedPositives,
           adaptedNeutrals,
           adaptedNegatives,
           subjectLabel
         );
+        if (!assembled) {
+          assembled = templateObj.compile(
+            adaptedPositives,
+            adaptedNeutrals,
+            adaptedNegatives,
+            subjectLabel
+          );
+        }
       }
 
       // Pronoun adaptations
@@ -1518,7 +1632,7 @@ export default function App() {
     });
 
     return result;
-  }, [compiledGroups, studentName, pronoun, currentGrade, currentSubject, activeDataset, subjectLabel, isConciseMode, checkedDimensions, generatorMode]);
+  }, [compiledGroups, studentName, pronoun, currentGrade, currentSubject, activeDataset, subjectLabel, isConciseMode, checkedDimensions, generatorMode, praiseOnly]);
 
   const matchedLabels = useMemo(() => {
     const rawChecked = checkedDimensions[currentSubject] || [];
@@ -1684,6 +1798,30 @@ export default function App() {
                   <option value="none">該生</option>
                 </select>
               </div>
+            </div>
+
+            {/* Praise Only Option for Outstanding Students */}
+            <div className={`p-3 rounded-xl border transition-all ${
+              praiseOnly 
+                ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-xs' 
+                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/70'
+            }`}>
+              <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  checked={praiseOnly}
+                  onChange={(e) => handlePraiseOnlyChange(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 text-amber-600 bg-white border-slate-300 rounded focus:ring-amber-500 accent-amber-600 cursor-pointer"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold flex items-center gap-1 text-slate-800">
+                    👑 特別優秀學生（完全只有讚美）
+                  </span>
+                  <p className="text-[10px] text-slate-500 font-medium leading-normal">
+                    勾選後將完全隱藏任何轉折（如「惟」、「但是」）或改進建議，評語將 100% 呈現極致的肯定與讚譽！
+                  </p>
+                </div>
+              </label>
             </div>
 
             {/* Grade Selection */}

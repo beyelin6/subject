@@ -55,6 +55,7 @@ export interface Student {
   grade: string;
   completed?: boolean;
   checkedDimensions?: Record<string, CheckedDimension[]>; // key is subjectKey
+  praiseOnly?: boolean;
 }
 
 export interface ArchetypeOrStyle {
