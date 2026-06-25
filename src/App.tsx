@@ -1795,6 +1795,162 @@ export default function App() {
     }
   };
 
+  const ensureFluency = (text: string): string => {
+    let cur = text;
+
+    // Fix empty fragments/placeholders and dangling words
+    cur = cur
+      .replace(/不只。/g, "表現優秀。")
+      .replace(/不只，/g, "表現優秀，")
+      .replace(/不僅。/g, "表現優秀。")
+      .replace(/不僅，/g, "表現優秀，")
+      .replace(/平時能。/g, "平時表現穩定。")
+      .replace(/平時能，/g, "平時表現穩定，")
+      .replace(/日常能。/g, "日常學習狀況良好。")
+      .replace(/日常能，/g, "日常學習狀況良好，")
+      .replace(/課堂中。/g, "課堂上表現積極。")
+      .replace(/課堂中，/g, "課堂上表現積極，")
+      .replace(/平常課堂。/g, "課堂上表現認真。")
+      .replace(/平常課堂，/g, "課堂上表現認真，")
+      .replace(/能。/g, "各項學習任務皆能認真完成。")
+      .replace(/雖能，/g, "雖然平時表現穩定，")
+      .replace(/雖能。/g, "雖然平時表現穩定。")
+      .replace(/主要在課後上/g, "主要在課後複習上")
+      .replace(/遇到挫折容易退縮放棄，等問題宜積極克服/g, "遇到挫折容易退縮，此點宜積極克服")
+      .replace(/雖然常有等狀況/g, "雖然在學習上仍有需要進步的地方")
+      .replace(/目前在上有明顯弱項/g, "目前在部分單元上仍有進步空間")
+      .replace(/日常中較多的現象/g, "日常學習上需要多花點心力")
+      .replace(/在上有很大發展空間/g, "在學習上有很大的發展空間")
+      .replace(/在上有很棒的領悟力/g, "在學科學習上有很棒的領悟力")
+      .replace(/在極具發展潛能/g, "在各學科上極具發展潛能")
+      .replace(/目前在皆未合乎預期/g, "目前在學業上仍有進步空間")
+      .replace(/在領域表現尚可/g, "在各學科領域表現尚可")
+      .replace(/常等問題/g, "常有一些細節上的問題")
+      .replace(/常等表現/g, "常有一些急躁的表現")
+      .replace(/常等狀況/g, "常有一些不夠專心的狀況")
+      .replace(/能精準且自律落實。/g, "能精準且自律落實各項課堂要求。")
+      .replace(/能精準落實。/g, "能精準落實各項課堂要求。")
+      .replace(/平日確實做好。/g, "平日確實做好各項學習本分。")
+      .replace(/不只，家庭與學校良好互動相得益彰，值得讚許。/g, "孩子在校表現極佳，加上家庭與學校良好互動相得益彰，值得讚許。")
+      .replace(/不僅，上課專心且各項任務都全力以赴，表現深得師長讚賞。/g, "孩子不僅上課專心且各項任務都全力以赴，表現深得師長讚賞。")
+      .replace(/不只，感謝家長平時的課後陪伴與引導，讓孩子學得很有成就。/g, "孩子在校表現極為優良，也非常感謝家長平時的課後陪伴與引導，讓孩子學得很有成就。")
+      .replace(/不僅，多接觸延伸知識，未來表現一定不可限量。/g, "孩子不僅表現亮眼，若能多接觸延伸知識，未來表現一定不可限量。")
+      .replace(/平常課堂，功課也寫得極其嚴謹用心。/g, "平常課堂表現認真專注，功課也寫得極其嚴謹用心。")
+      .replace(/課堂中，課後學習成效理想，表現值得嘉許。/g, "課堂中表現專心，課後學習成效理想，表現值得嘉許。")
+      .replace(/聽講時，展現了極佳的自我要求/g, "聽講時專心致志，展現了極佳的自我要求")
+      .replace(/平時上課，各項學習任務皆能順利圓滿完成。/g, "平時上課專心認真，各項學習任務皆能順利圓滿完成。")
+      .replace(/日常能落實，親師密切配合/g, "日常能落實各項自律本分，加上親師密切配合")
+      .replace(/平日常能做到，家庭與學校良好互動/g, "平日常能做到自主學習，加上家庭與學校良好互動")
+      .replace(/日常中常有。/g, "日常學習中偶有分心狀況。")
+      .replace(/日常常有等狀況，需多花費時間並配合老師，重打基礎。/g, "日常常有一些不夠專心的狀況，需多花費時間並配合老師，重打基礎。")
+      .replace(/目前常。別氣餒/g, "目前在學習上遇到些小瓶頸。別氣餒")
+      .replace(/拿出你平時的活力，跟著老師的腳步一起克服困難。/g, "希望你能拿出平時的活力，跟著老師的腳步一起克服困難。")
+      .replace(/最近有些無精打采，常有等表現。/g, "最近有些無精打采，日常學習上常有些分心。")
+      .replace(/雖然面對在上的瓶頸/g, "雖然面對學習上的瓶頸")
+      .replace(/在上面臨不少考驗，常。/g, "在學習上面臨不少考驗，常有些力不從心。")
+      .replace(/遭遇不少挫折，常有等手足無措情形。/g, "遭遇不少挫折，常有些手足無措的情形。")
+      .replace(/雖然日常在遇到些小障礙/g, "雖然日常在學習上遇到些小障礙")
+      .replace(/學習雖卡關，面對有些吃力/g, "學習雖有些卡關，面對新觀念感到吃力")
+      .replace(/學語文不怕起步慢。雖較落後/g, "學習學科不怕起步慢。雖然起步時較落後")
+      .replace(/而。/g, "。")
+      .replace(/惟。/g, "。")
+      .replace(/。，/g, "。")
+      .replace(/，，/g, "，")
+      .replace(/，。/g, "。")
+      .replace(/、。/g, "。")
+      .replace(/且。/g, "。")
+      .replace(/並。/g, "。")
+      .replace(/但。/g, "。")
+      .replace(/，且。/g, "。")
+      .replace(/，且，/g, "，且")
+      .replace(/，，/g, "，")
+      .replace(/，，/g, "，");
+
+    return cur;
+  };
+
+  const applyToneAdjustment = (text: string, tone: 'formal' | 'warm' | 'brief'): string => {
+    let cur = text;
+    if (tone === 'formal') {
+      cur = cur
+        .replace(/老師相信你/g, "期盼該生")
+        .replace(/非常棒喔！/g, "表現優良，殊堪嘉許。")
+        .replace(/很棒！/g, "表現優良，殊堪嘉許。")
+        .replace(/你一定能/g, "定能")
+        .replace(/孩子/g, "該生")
+        .replace(/一定會進步得更快/g, "當能獲致更大之進步")
+        .replace(/一定能越做越棒！/g, "當能日臻完善。")
+        .replace(/我們一起克服/g, "盼親師攜手輔導克服")
+        .replace(/越做越棒/g, "日益進步")
+        .replace(/真的棒/g, "堪稱優秀")
+        .replace(/會更棒喔！/g, "定能更臻完美。")
+        .replace(/明天會更好。/g, "前景可期。")
+        .replace(/明天會更好/g, "定能更臻進步")
+        .replace(/加油/g, "勉其精益求精")
+        .replace(/很棒/g, "卓越")
+        .replace(/真的很棒/g, "至為優秀")
+        .replace(/加油喔/g, "期勉更上層樓");
+    } else if (tone === 'warm') {
+      cur = cur
+        .replace(/該生/g, "孩子")
+        .replace(/表現尚可/g, "有很大的進步空間，繼續加油！")
+        .replace(/未臻理想/g, "遇到了一點小挑戰，沒關係，我們一起加油！")
+        .replace(/盼能改善。/g, "老師相信只要多加練習，一定能越來越好喔！")
+        .replace(/殊堪嘉許/g, "非常棒喔！")
+        .replace(/期盼其/g, "老師相信他")
+        .replace(/當能獲致進步/g, "一定能大有進步喔！")
+        .replace(/期勉/g, "老師想對你說，加油喔，")
+        .replace(/勉其/g, "老師相信你");
+    } else if (tone === 'brief') {
+      cur = cur
+        .replace(/在校學習成果極佳，能出色且穩健地落實/g, "表現極佳，能落實")
+        .replace(/大腦思維極其敏捷，擁有天賦滿滿的驚人潛力/g, "思考敏捷，極具潛力")
+        .replace(/擁有極高的學習熱忱與探究精神/g, "學習熱忱高")
+        .replace(/是個溫柔、懂事且極富貼心的優秀孩子/g, "溫和懂事")
+        .replace(/這學期在學科領域的各項能力展現出極致優異/g, "本學期學科表現優異")
+        .replace(/本學期在領域的學習成效極為卓越/g, "本學期表現極為卓越")
+        .replace(/步伐沉穩且無比踏實/g, "態度沉穩踏實")
+        .replace(/是全班神采奕奕的活力先鋒與靈魂人物/g, "課堂表現活潑有朝氣")
+        .replace(/本學期在學科領域的學習表現堪稱楷模/g, "學習表現優異，堪為楷模")
+        .replace(/學習態度極其認真且無比踏實/g, "學習認真踏實")
+        .replace(/在領域的理解力與領悟力極其出眾/g, "理解力與領悟力出眾")
+        .replace(/這學期在學習上取得了極富成效的躍進/g, "本學期學習有顯著進步")
+        .replace(/思維極為敏捷且聰慧過過人/g, "思維敏捷")
+        .replace(/在班上溫和有禮、極守秩序/g, "溫和有禮，遵守秩序")
+        .replace(/學習態度積極勤勉/g, "學習積極勤勉")
+        .replace(/做事極為穩重、踏實且有耐心/g, "穩重踏實，有耐心")
+        .replace(/性格活潑開朗且極具朝氣/g, "活潑開朗，有朝氣")
+        .replace(/深具熱心與團隊合作精神/g, "具團隊合作精神")
+        .replace(/課堂表現主動積極/g, "課堂主動積極")
+        .replace(/感謝家長平時溫暖、高品質的陪伴引導/g, "感謝家長配合指引")
+        .replace(/令人無比讚賞！/g, "值得讚賞。")
+        .replace(/十分令人欽佩！/g, "令人肯定。")
+        .replace(/表現堪稱完美！/g, "表現優異。")
+        .replace(/學習成效非常優異且出色！/g, "成效優異。")
+        .replace(/深得老師與同學的讚許與信賴！/g, "深受肯定。")
+        .replace(/相當值得嘉許！/g, "值得嘉許。")
+        .replace(/表現令人萬分肯定！/g, "表現肯定。")
+        .replace(/學習表現非常亮眼！/g, "表現亮眼。")
+        .replace(/是班上非常優秀的耀眼棟樑！/g, "表現優異。")
+        .replace(/展現出過人實力與耀眼的學習成效，十分優秀！/g, "表現出色。")
+        .replace(/每項學術成果皆令人驚艷，充分展現出超越同齡的卓越才華！/g, "表現非常卓越。")
+        .replace(/表現卓越非凡，日常態度溫和謙遜且充滿教養，深受所有師長的喜愛與讚賞！/g, "表現溫和懂事，深受師長喜愛。")
+        .replace(/在各項學習挑戰中皆能脫穎而出，堪為班級中無比出色的領跑者！/g, "表現優異，堪為表率。")
+        .replace(/概念理解深刻，展現了嚴謹、紮實且極具深度的高水準學術素養！/g, "理解深刻，基礎扎實。")
+        .replace(/專注力極佳，卓越且聰慧的表現令人感到無比自豪與期待！/g, "表現聰慧，未來可期。")
+        .replace(/學科底子深厚，平常能高效率且熟練做好/g, "底子深厚，能熟練做好")
+        .replace(/這種堅毅、踏實且不浮躁的進取態度，難能可貴！/g, "態度踏實，難能可貴。")
+        .replace(/陽光且樂觀進取的優異表現備受大家的喜愛與喝采！/g, "表現深受喜愛。")
+        .replace(/自律與自省態度值得高度嘉許！/g, "態度值得嘉許。")
+        .replace(/！/g, "。")
+        .replace(/，，/g, "，")
+        .replace(/，。/g, "。")
+        .replace(/。+/g, "。")
+        .replace(/，+/g, "，");
+    }
+    return cur;
+  };
+
   // Compile active cards based on active templates and fields
   const activeDataset = generatorMode === 'archetypes' ? ARCHETYPES : STYLES;
   const activeSubjectObj = GRADE_SUBJECTS[currentGrade]?.[currentSubject] || GRADE_SUBJECTS['3']['chinese'];
@@ -1886,11 +2042,15 @@ export default function App() {
         assembled = sanitizePunctuation(assembled);
       }
 
+      assembled = ensureFluency(assembled);
+      assembled = applyToneAdjustment(assembled, tonePreference);
+      assembled = sanitizePunctuation(assembled);
+
       result[key] = assembled;
     });
 
     return result;
-  }, [compiledGroups, studentName, pronoun, currentGrade, currentSubject, activeDataset, subjectLabel, isConciseMode, checkedDimensions, generatorMode, praiseOnly]);
+  }, [compiledGroups, studentName, pronoun, currentGrade, currentSubject, activeDataset, subjectLabel, isConciseMode, checkedDimensions, generatorMode, praiseOnly, tonePreference]);
 
   const matchedLabels = useMemo(() => {
     const rawChecked = checkedDimensions[currentSubject] || [];
@@ -2516,6 +2676,51 @@ export default function App() {
                     }`}
                   />
                 </button>
+              </div>
+
+              {/* Tone Preference Selector Panel */}
+              <div className="flex flex-col gap-2 bg-sky-50/40 border border-sky-100 p-2.5 rounded-xl text-xs mt-2 shadow-2xs">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5 bg-sky-100 rounded-full flex items-center justify-center text-sky-600 shrink-0 shadow-3xs">
+                    <Sparkles className="w-3 h-3 text-sky-600" />
+                  </div>
+                  <span className="font-extrabold text-slate-700">🔮 評語語氣微調風格</span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handleToneChange('formal')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all ${
+                      tonePreference === 'formal'
+                        ? 'bg-sky-600 border-sky-600 text-white shadow-xs scale-102 font-extrabold'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    ⚖️ 正式嚴謹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleToneChange('warm')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all ${
+                      tonePreference === 'warm'
+                        ? 'bg-sky-600 border-sky-600 text-white shadow-xs scale-102 font-extrabold'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    ❤️ 溫馨鼓勵
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleToneChange('brief')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all ${
+                      tonePreference === 'brief'
+                        ? 'bg-sky-600 border-sky-600 text-white shadow-xs scale-102 font-extrabold'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    ⚡ 簡短明快
+                  </button>
+                </div>
               </div>
             </div>
 
