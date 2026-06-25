@@ -788,6 +788,230 @@ export default function App() {
     return '';
   };
 
+  const compileShortLifeComment = (
+    subjectKey: string,
+    key: string,
+    pos: string[],
+    neu: string[],
+    neg: string[],
+    sub: string,
+    praiseOnly: boolean
+  ): string => {
+    const allParts = [...pos, ...neu];
+    const isGeneral = subjectKey === 'general';
+
+    if (praiseOnly || neg.length === 0) {
+      if (key === 'excel') {
+        return isGeneral
+          ? `平時${smartJoin(allParts)}，日常表現極其出眾，自律且富有責任感，堪為楷模，令人無比讚賞！`
+          : `在健康習慣上自主有恆，平時${smartJoin(allParts)}，展現優異的自理能力與正確防護觀念，非常出色！`;
+      }
+      if (key === 'diligent') {
+        return isGeneral
+          ? `平時做事極為認真踏實，且能${smartJoin(allParts)}，自我要求高又負責，態度十分令人欽佩！`
+          : `日常極具自律精神，能確實${smartJoin(allParts)}，持之以恆維護個人良好生活習慣，值得肯定！`;
+      }
+      if (key === 'improved') {
+        return isGeneral
+          ? `這學期有著極為亮眼的成長與進步！平時${smartJoin(allParts)}，熱情投入日常活動，表現相當精彩！`
+          : `在日常健康自主管理上進步神速！平時能${smartJoin(allParts)}，自理能力與態度均有卓越提升！`;
+      }
+      if (key === 'careless') {
+        return isGeneral
+          ? `反應敏捷、思維靈活，平時能輕鬆做到${smartJoin(allParts)}，各項事務與活動皆展現出色才華，表現亮眼！`
+          : `反應敏捷且理解力強，日常中常能${smartJoin(allParts)}，迅速掌握健康與安全知能，非常優秀！`;
+      }
+      if (key === 'passive') {
+        return isGeneral
+          ? `在團體中溫和有禮、遵守秩序，平時能默默做到${smartJoin(allParts)}，行事穩健且讓人信賴，值得讚賞！`
+          : `行事溫和、作風規矩，平時能主動${smartJoin(allParts)}，默默維持良好日常作息，深得師長肯定！`;
+      }
+      if (key === 'struggling') {
+        return isGeneral
+          ? `做事態度積極勤勉，平時配合度佳且能${smartJoin(allParts)}，持之以恆、默默付出的努力十分值得嘉許！`
+          : `在日常健康習慣養成上相當有心，平時積極做到${smartJoin(allParts)}，自我精進的精神與行動非常棒！`;
+      }
+      if (key === 'slowButGood') {
+        return isGeneral
+          ? `做事踏實有耐心，能全心投入做好${smartJoin(allParts)}，以滴水穿石的精神打下良好基礎，表現令人肯定！`
+          : `態度沉穩且不急不躁，日常中能用心落實${smartJoin(allParts)}，默默維持良好生活習慣，難能可貴！`;
+      }
+      if (key === 'activeDistracted') {
+        return isGeneral
+          ? `性格活潑開朗且極具朝氣，平時能高效率做好${smartJoin(allParts)}，為團體帶來充沛的正面能量，表現亮眼！`
+          : `充滿活力、熱愛運動，平時能開心地落實${smartJoin(allParts)}，身心健全且朝氣蓬勃，深得大家喜愛！`;
+      }
+      if (key === 'cooperative') {
+        return isGeneral
+          ? `熱心且深具合作精神，平時積極做到${smartJoin(allParts)}，在小組與團體中能引導他人，是優秀的棟樑！`
+          : `樂於分享與服務他人，日常中除了能${smartJoin(allParts)}，也能協助營造健康安全的環境，十分貼心！`;
+      }
+      if (key === 'impatient') {
+        return isGeneral
+          ? `做事積極果斷，平時在各項事務中能敏捷做到${smartJoin(allParts)}，反應快、效率高，表現十分優秀！`
+          : `參與積極且作風果斷，日常能高效率做好${smartJoin(allParts)}，掌握健康安全要領迅速，極具行動力！`;
+      }
+
+      // Styles
+      if (key === 'inspiring') {
+        return isGeneral
+          ? `富有高度的探索熱忱，平時能${smartJoin(allParts)}，對身邊事物充滿好奇心，才華與表現令人驚艷！`
+          : `健康意識強烈且充滿朝氣，平時能${smartJoin(allParts)}，對自身的衛生與防護主動探究，非常優秀！`;
+      }
+      if (key === 'gentle') {
+        return isGeneral
+          ? `是個溫柔、懂事又貼心的孩子，平時能體體貼待人並做到${smartJoin(allParts)}，深受大家的肯定與愛戴！`
+          : `是個貼心又規矩的孩子，平時在個人自理上能落實${smartJoin(allParts)}，溫和謙遜且習慣良好，讓人放心！`;
+      }
+      if (key === 'growth') {
+        return isGeneral
+          ? `這學期在各方面都展現出極致優異，日常能精準做好${smartJoin(allParts)}，自主進取心強，非常亮眼！`
+          : `自我健康管理與自控力越來越棒！日常能確實做好${smartJoin(allParts)}，自律成長的表現十分可嘉！`;
+      }
+      if (key === 'academic') {
+        return isGeneral
+          ? `平時作風穩健且極具條理，日常中能自律落實${smartJoin(allParts)}，行為成熟，展現出高度的自主素養！`
+          : `健康知能理解深刻且實踐有條理，能規律落實${smartJoin(allParts)}，生活管理與防護觀念紮實！`;
+      }
+      if (key === 'potential') {
+        return isGeneral
+          ? `思維敏捷、潛力無限，平時能極佳地做到${smartJoin(allParts)}，聰慧且亮眼的表現令人感到驕傲！`
+          : `理解力出眾、學習敏銳度高，日常中能高標準落實${smartJoin(allParts)}，身心發展健全，極具潛能！`;
+      }
+      if (key === 'collaboration') {
+        return isGeneral
+          ? `本學期成果極佳，能穩健做好${smartJoin(allParts)}。感謝家長的溫暖引導，共同成就孩子如此非凡表現！`
+          : `日常健康自理表現亮眼，能自律做好${smartJoin(allParts)}。感謝家庭教育的用心落實，攜手培育優秀特質！`;
+      }
+      if (key === 'advice') {
+        return isGeneral
+          ? `理解力強且很有條理，平時能高效率做好${smartJoin(allParts)}，方法科學，是大家效法的典範！`
+          : `防護與保健常識極佳，日常能高效率做好${smartJoin(allParts)}，方法科學有條理，展現出色的生活知能！`;
+      }
+      if (key === 'steadfast') {
+        return isGeneral
+          ? `步伐沉穩且無比踏實，平時能完美做好${smartJoin(allParts)}，持之以恆且默默精進，態度難能可貴！`
+          : `自理與保健習慣極為紮實，平時能堅持做好${smartJoin(allParts)}，自律有恆心，展現健康的優質素養！`;
+      }
+      if (key === 'energetic') {
+        return isGeneral
+          ? `是大家的活力先鋒，日常中總能精神飽滿地做到${smartJoin(allParts)}，陽光樂觀，深得大家的喜愛！`
+          : `散發著健康活力的陽光氣息，平時能積極做到${smartJoin(allParts)}，動能充沛、身心健全，十分討喜！`;
+      }
+      if (key === 'classic') {
+        return isGeneral
+          ? `日常表現堪稱楷模，平時能完美做到${smartJoin(allParts)}，自主與負責的態度值得高度嘉許！`
+          : `在日常衛生與作息上堪稱楷模，能完美做到${smartJoin(allParts)}，生活習慣良好，深受大家的讚許！`;
+      }
+    } else {
+      // With improvement points (neg is not empty)
+      if (key === 'excel') {
+        return isGeneral
+          ? `平時${smartJoin(allParts)}，日常表現出眾。若在${smartJoin(neg)}上能更加留意與調整，就更完美了，加油！`
+          : `在個人保健上十分出色，日常能做好${smartJoin(allParts)}。若在${smartJoin(neg)}上更加留意，自理習慣將更完美！`;
+      }
+      if (key === 'diligent') {
+        return isGeneral
+          ? `做事認真踏實，且能${smartJoin(allParts)}。雖然目前在${smartJoin(neg)}上需多花點心思，只要維持恆心一定能有大進步！`
+          : `日常習慣極具自律，能確實落實${smartJoin(allParts)}。若在${smartJoin(neg)}方面多加注意，身體管理與生活自理將更健全！`;
+      }
+      if (key === 'improved') {
+        return isGeneral
+          ? `這學期有著很明顯的進步！平時不只${smartJoin(allParts)}，對於以往較不擅長的${smartJoin(neg)}也改善很多，真的很棒！`
+          : `在自主健康管理上有顯著進步！平時能做好${smartJoin(allParts)}，倘若再針對${smartJoin(neg)}持續加油，表現會更突出！`;
+      }
+      if (key === 'careless') {
+        return isGeneral
+          ? `反應敏捷、思維靈活，日常能很快做到${smartJoin(allParts)}。就是有時行事較急躁，若能多注意${smartJoin(neg)}，表現會更突出！`
+          : `理解力強且反應靈活，日常能做到${smartJoin(allParts)}。有時行事細緻度稍嫌不足，若能注意${smartJoin(neg)}，會更加健康安全！`;
+      }
+      if (key === 'passive') {
+        return isGeneral
+          ? `在團體中溫和有禮、遵守秩序，能做到${smartJoin(allParts)}。若日常能再積極主動些，改善${smartJoin(neg)}，表現會更棒！`
+          : `作風規矩守紀，平時能做好${smartJoin(allParts)}。如果日常能更主動參與，改善${smartJoin(neg)}，就更完美了！`;
+      }
+      if (key === 'struggling') {
+        return isGeneral
+          ? `做事態度積極，平時配合度佳且能${smartJoin(allParts)}。雖然目前在${smartJoin(neg)}上遇到些瓶頸，只要多加練習定能漸入佳境！`
+          : `對健康習慣養成其實有心，能配合做好${smartJoin(allParts)}。但在${smartJoin(neg)}上有些吃力，多予陪伴引導定能逐步上手！`;
+      }
+      if (key === 'slowButGood') {
+        return isGeneral
+          ? `做事踏實有耐心，平時默默落實${smartJoin(allParts)}。在面臨${smartJoin(neg)}等挑戰時別氣餒，保持步調、多給自己一些信心！`
+          : `日常習慣養成雖慢但非常用心，平時能做到${smartJoin(allParts)}。若遇到${smartJoin(neg)}的調整時別急躁，循序漸進即可！`;
+      }
+      if (key === 'activeDistracted') {
+        return isGeneral
+          ? `性格活潑開朗，日常能做到${smartJoin(allParts)}。就是定性還不夠，有時因興奮造成${smartJoin(neg)}，多練習定下心，成果會更出色！`
+          : `元氣滿滿且熱愛運動，平時能落實${smartJoin(allParts)}。有時玩得太忘我而忽略了${smartJoin(neg)}，日常多一分謹慎，安全更有保障！`;
+      }
+      if (key === 'cooperative') {
+        return isGeneral
+          ? `非常熱心且深具合作精神，平時積極做到${smartJoin(allParts)}。若能多把注意力分給自己，改善${smartJoin(neg)}，表現會更均衡！`
+          : `樂於關懷他人，在健康自理上能做好${smartJoin(allParts)}。若能再提醒自己克服${smartJoin(neg)}，個人習慣養成會更為全面！`;
+      }
+      if (key === 'impatient') {
+        return isGeneral
+          ? `辦事積極果斷，平時能敏捷做到${smartJoin(allParts)}。不過耐心稍微不足，若遇到不順心時避免${smartJoin(neg)}，多一分堅持，實力絕對沒問題！`
+          : `行動迅速、自理積極，日常能敏捷做到${smartJoin(allParts)}。惟耐心與毅力若能再加強，改善${smartJoin(neg)}，習慣維持會更持久！`;
+      }
+
+      // Styles
+      if (key === 'inspiring') {
+        return isGeneral
+          ? `求知慾旺盛，平時能把${smartJoin(allParts)}做得很好。雖偶爾在${smartJoin(neg)}上遇到挑戰，這都是必經的過程，老師相信你能越做越棒！`
+          : `健康意識良好，平時能做好${smartJoin(allParts)}。若能主動改善${smartJoin(neg)}等細節，就能擁有更健康的生活！`;
+      }
+      if (key === 'gentle') {
+        return isGeneral
+          ? `是個溫柔貼心的孩子，平時能做到${smartJoin(allParts)}。如果遇上${smartJoin(neg)}等情況也別氣餒，放鬆心情跟著大家慢慢調適！`
+          : `貼心且規矩良好，日常能落實${smartJoin(allParts)}。倘若在${smartJoin(neg)}上遇到小困難，跟著師長慢慢練習，一定能克服！`;
+      }
+      if (key === 'growth') {
+        return isGeneral
+          ? `這學期在${smartJoin(allParts)}上表現得很不錯。面對${smartJoin(neg)}的不足也別擔心，這些正是成長的目標，跨過去就是很大的進步！`
+          : `個人自理與防護表現優異，日常能做到${smartJoin(allParts)}。面對${smartJoin(neg)}的微小缺失，我們繼續加油，一定能做得更好！`;
+      }
+      if (key === 'academic') {
+        return isGeneral
+          ? `平時作風穩健有條理，日常中能自律落實${smartJoin(allParts)}。若能在${smartJoin(neg)}上少一分粗心、多一分仔細，自我管理會更完美！`
+          : `生活衛生與防護概念成熟，能規律做好${smartJoin(allParts)}。惟在${smartJoin(neg)}上若能加強細心度，保健成效會更扎實。`;
+      }
+      if (key === 'potential') {
+        return isGeneral
+          ? `腦袋靈活有滿滿潛力，平時能高標準完成${smartJoin(allParts)}。就是有時稍微${smartJoin(neg)}，如果能收心、定下心來，表現一定更驚人！`
+          : `理解力出眾、反應靈活，日常能做到${smartJoin(allParts)}。若能約束好自己，克服${smartJoin(neg)}，一定能發揮更棒的潛能！`;
+      }
+      if (key === 'collaboration') {
+        return isGeneral
+          ? `本學期在各方面能順利展現${smartJoin(allParts)}。惟在${smartJoin(neg)}上稍微急躁，仍需要親師一邊陪伴引導，協助他養成良好習慣！`
+          : `日常已能配合做好${smartJoin(allParts)}。不過在${smartJoin(neg)}方面仍需親師共同陪伴提醒，攜手引導孩子養成良好生活作息！`;
+      }
+      if (key === 'advice') {
+        return isGeneral
+          ? `底子很好，平時能熟練做好${smartJoin(allParts)}。如果想減少${smartJoin(neg)}的失誤，建議多用心、細心觀察要求，定能有更大的進步！`
+          : `健康與防護常識充足，日常能做對${smartJoin(allParts)}。若能避免${smartJoin(neg)}的漏洞，個人保健將更加全面！`;
+      }
+      if (key === 'steadfast') {
+        return isGeneral
+          ? `步伐踏實沉穩，平時能自律落實${smartJoin(allParts)}。遇到${smartJoin(neg)}等需調整處也默默努力，這種踏實耐心的進取態度難能可貴！`
+          : `自理習慣養成踏實，日常能做好${smartJoin(allParts)}。遇到${smartJoin(neg)}等不理想處也能耐心配合改進，這份定性十分令人欽佩！`;
+      }
+      if (key === 'energetic') {
+        return isGeneral
+          ? `在班上充滿朝氣，平時能神采奕奕做到${smartJoin(allParts)}。若能多練習讓自己定下心、避免那些因${smartJoin(neg)}導致的失誤，表現會更卓越！`
+          : `活潑好動且熱愛體育，平時能積極做好${smartJoin(allParts)}。若日常中能更沉穩細緻、注意避免${smartJoin(neg)}，安全與健康更有保障！`;
+      }
+      if (key === 'classic') {
+        return isGeneral
+          ? `這學期各方面表現穩定，能做好${smartJoin(allParts)}。偶爾在${smartJoin(neg)}上多用心、避免粗心，未來一定會表現得更好！`
+          : `衛生與日常作息表現極佳，能做到${smartJoin(allParts)}。若能在${smartJoin(neg)}上多加注意並持之以恆，絕對是不可多得的優秀孩子！`;
+      }
+    }
+
+    return '';
+  };
+
   const adaptPhrasingForType = (phrases: string[], typeKey: string, level: 'pos' | 'neg'): string[] => {
     return phrases.map(phrase => {
       let res = phrase;
@@ -1578,7 +1802,17 @@ export default function App() {
       const adaptedNegatives = adaptPhrasingForType(compiledGroups.negatives, key, 'neg');
 
       let assembled = "";
-      if (praiseOnly || adaptedNegatives.length === 0) {
+      if (currentSubject === 'general' || currentSubject === 'health') {
+        assembled = compileShortLifeComment(
+          currentSubject,
+          key,
+          adaptedPositives,
+          adaptedNeutrals,
+          adaptedNegatives,
+          subjectLabel,
+          praiseOnly || adaptedNegatives.length === 0
+        );
+      } else if (praiseOnly || adaptedNegatives.length === 0) {
         assembled = compilePraiseOnlyComment(
           key,
           adaptedPositives,
