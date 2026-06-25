@@ -52,6 +52,7 @@ export default function App() {
   // Generators layout or settings states
   const [generatorMode, setGeneratorMode] = useState<'archetypes' | 'styles'>('styles');
   const [isConciseMode, setIsConciseMode] = useState(true);
+  const [tonePreference, setTonePreference] = useState<'formal' | 'warm' | 'brief'>('warm');
   const [variationSeeds, setVariationSeeds] = useState<Record<string, number>>({});
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
   const [editedTexts, setEditedTexts] = useState<Record<string, string>>({});
@@ -91,6 +92,20 @@ export default function App() {
       try { setCustomDimensions(JSON.parse(saved)); } catch (e) { console.error(e); }
     }
   }, []);
+
+  // Load saved tone preference on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('school_tone_preference_v3');
+    if (saved === 'formal' || saved === 'warm' || saved === 'brief') {
+      setTonePreference(saved);
+    }
+  }, []);
+
+  const handleToneChange = (tone: 'formal' | 'warm' | 'brief') => {
+    setTonePreference(tone);
+    localStorage.setItem('school_tone_preference_v3', tone);
+    setEditedTexts({});
+  };
 
   // Load active state from localStorage or update when active pupil changes
   useEffect(() => {
@@ -552,62 +567,69 @@ export default function App() {
     };
 
     const posCount = pos.length;
-    const neuCount = neu.length;
     const negCount = neg.length;
 
-    // Detect specific standard checked dimensions
     const hasAttitudeLow = checkedList.some(item => item.id === 'gen_attitude' && item.level === 'low');
     const hasAttitudeHigh = checkedList.some(item => item.id === 'gen_attitude' && item.level === 'high');
     const hasHomeworkLow = checkedList.some(item => item.id === 'gen_homework' && item.level === 'low');
     const hasHomeworkHigh = checkedList.some(item => item.id === 'gen_homework' && item.level === 'high');
-    const hasDisciplineLow = checkedList.some(item => item.id === 'gen_discipline' && item.level === 'low');
-    const hasCooperationHigh = checkedList.some(item => item.id === 'gen_cooperation' && item.level === 'high');
 
-    // 1. excel
-    scores.excel = posCount * 3 - negCount * 2;
-    if (hasAttitudeHigh) scores.excel += 2;
-    if (hasHomeworkHigh) scores.excel += 2;
+    // Excel: lots of high, no low, good attitude & homework
+    if (posCount >= 2 && negCount === 0) {
+      scores.excel += 3;
+      if (hasAttitudeHigh) scores.excel += 2;
+      if (hasHomeworkHigh) scores.excel += 2;
+    }
 
-    // 2. diligent
-    scores.diligent = neuCount * 2 + posCount * 1.5 - negCount * 2.5;
+    // Diligent: high attitude, high homework
+    if (hasAttitudeHigh) scores.diligent += 2;
     if (hasHomeworkHigh) scores.diligent += 2;
+    if (negCount === 0 && posCount > 0) scores.diligent += 1;
 
-    // 3. improved
-    scores.improved = posCount * 2 - negCount * 1;
-    if (checkedList.length >= 2) scores.improved += 1.5;
-
-    // 4. careless
-    if (posCount >= 1 && (hasHomeworkLow || hasAttitudeLow || hasDisciplineLow)) {
-      scores.careless = posCount * 3 + negCount * 1.5;
+    // Improved: has both positive and negative elements, showing change
+    if (posCount > 0 && negCount > 0) {
+      scores.improved += 2;
     }
 
-    // 5. passive
-    scores.passive = neuCount * 3 - posCount * 1 - negCount * 1;
-    if (!hasAttitudeLow && !hasDisciplineLow && negCount === 0) {
-      scores.passive += 2;
+    // Careless: high performance/positives but low homework or has careless checked items
+    if (posCount > 0 && (hasHomeworkLow || hasAttitudeLow)) {
+      scores.careless += 2;
+    }
+    if (checkedList.some(item => item.id.includes('calculation') && item.level === 'low')) {
+      scores.careless += 1;
     }
 
-    // 6. struggling
-    scores.struggling = negCount * 4 - posCount * 3;
-    if (hasAttitudeLow) scores.struggling += 1.5;
-    if (hasHomeworkLow) scores.struggling += 1.5;
-
-    // 7. slowButGood
-    scores.slowButGood = neuCount * 2 + negCount * 2 - posCount * 3;
-
-    // 8. activeDistracted
-    if (hasAttitudeLow || hasDisciplineLow) {
-      scores.activeDistracted = posCount * 1.5 + negCount * 2;
+    // Passive: low in speaking/participation, high in attitude
+    if (hasAttitudeHigh && checkedList.some(item => (item.id.includes('speaking') || item.id.includes('participation') || item.id.includes('interact')) && item.level === 'low')) {
+      scores.passive += 3;
     }
 
-    // 9. cooperative
-    if (hasCooperationHigh) {
-      scores.cooperative = posCount * 2 + 4;
+    // Struggling: multiple lows
+    if (negCount >= 2) {
+      scores.struggling += 3;
+    }
+    if (checkedList.some(item => item.level === 'low')) {
+      scores.struggling += 1;
     }
 
-    // 10. impatient
-    if (hasHomeworkLow && negCount >= 1) {
-      scores.impatient = negCount * 3 + 2;
+    // SlowButGood: low in speed, high in homework/attitude
+    if (checkedList.some(item => item.id.includes('speed') && item.level === 'low') && (hasAttitudeHigh || hasHomeworkHigh)) {
+      scores.slowButGood += 3;
+    }
+
+    // ActiveDistracted: low in attitude or focus, high in energy/participation
+    if (hasAttitudeLow && checkedList.some(item => (item.id.includes('interact') || item.id.includes('speaking')) && item.level === 'high')) {
+      scores.activeDistracted += 3;
+    }
+
+    // Cooperative: high in interaction/cooperation
+    if (checkedList.some(item => (item.id.includes('interact') || item.id.includes('cooperate')) && item.level === 'high')) {
+      scores.cooperative += 3;
+    }
+
+    // Impatient: high in content/speed but low in patience/review
+    if (checkedList.some(item => item.id.includes('speed') && item.level === 'high') && (hasAttitudeLow || hasHomeworkLow)) {
+      scores.impatient += 3;
     }
 
     return scores;
@@ -620,21 +642,23 @@ export default function App() {
     checkedList: CheckedDimension[]
   ): string[] => {
     const scores = getStudentArchetypeScores(pos, neu, neg, checkedList);
-    
-    // Sort and grab all with score > 0
-    const sorted = Object.entries(scores)
-      .filter(([_, score]) => score > 0)
-      .sort((a, b) => b[1] - a[1])
-      .map(([key]) => key);
+    let maxScore = 0;
+    Object.values(scores).forEach(s => {
+      if (s > maxScore) maxScore = s;
+    });
 
-    if (sorted.length === 0) {
-      if (pos.length >= neg.length) {
-        return ['excel'];
-      } else {
-        return ['struggling'];
-      }
+    if (maxScore === 0) {
+      if (neg.length === 0) return ['excel', 'diligent'];
+      return ['improved', 'struggling'];
     }
-    return sorted;
+
+    const matches: string[] = [];
+    Object.keys(scores).forEach(k => {
+      if (scores[k] === maxScore) {
+        matches.push(k);
+      }
+    });
+    return matches;
   };
 
   const compileAdvancedRhetoricComment = (
@@ -645,19 +669,19 @@ export default function App() {
     sub: string
   ): string => {
     const allParts = [...pos, ...neu];
-    
+
     // Archetype Keys templates
     if (key === 'excel') {
-      return `在${sub}理解力很棒，平常上課${smartJoin(allParts)}。只要寫作業與作答時多留意${smartJoin(neg) || '容易忽視的小地方'}，這學期的學習成果就更完美了，繼續加油！`;
+      return `在${sub}學習上，平時${smartJoin(allParts)}，表現相當優秀。如果能在${smartJoin(neg) || '一些細節處'}多加細心與留意，學習成果就更完美了，繼續加油！`;
     }
     if (key === 'diligent') {
-      return `學習態度非常認真踏實，平常課堂${smartJoin(allParts)}，功課也寫得很用心。雖然目前在${smartJoin(neg) || '理解深度上'}需要多花一點點心思，但只要維持這份好習慣，一定能有大進步！`;
+      return `學習態度認真踏實，平時${smartJoin(allParts)}，功課也很用心。雖然目前在${smartJoin(neg) || '部分觀念上'}還需要多花心思，只要繼續保持，一定能有大進步！`;
     }
     if (key === 'improved') {
-      return `這學期在${sub}有很明顯的進步！上課不只${smartJoin(allParts)}，對原本比較頭疼的${smartJoin(neg) || '自律與主動性'}也改善很多、變得更積極，真的很棒！`;
+      return `這學期在${sub}有很明顯的進步！不僅${smartJoin(allParts)}，對原本需要加強的${smartJoin(neg) || '主動性'}也改善許多，變得很積極，真的很棒！`;
     }
     if (key === 'careless') {
-      return `頭腦反應快、很聰明，平常在${sub}課堂能很快做到${smartJoin(allParts)}。就是寫題目和作答有時比較急躁，如果能多耐心複查、多注意${smartJoin(neg) || '容易粗心的小細節'}，表現會更突出！`;
+      return `反應敏捷、思維靈活，平時能很快做到${smartJoin(allParts)}。惟有時比較急躁，如果能多耐心複查、多注意${smartJoin(neg) || '容易粗心的小細節'}，表現會更突出！`;
     }
     if (key === 'passive') {
       return `在班上很乖很守秩序，平日在${sub}能安靜做到${smartJoin(allParts)}。不過課堂上稍微有些害羞，如果能更勇敢一點，多主動發問或克服${smartJoin(neg) || '被動退縮'}，會更棒喔！`;
